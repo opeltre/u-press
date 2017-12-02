@@ -1,0 +1,92 @@
+@font-face {
+    font-family:"hyperspace";
+    src: url("/fonts/hyperspace/Hyperspace_Bold.otf");
+}
+@font-face {
+    font-family:"libertine";
+    src: url("/fonts/LinLibertine/LinLibertine_Rah.ttf");
+}
+@font-face {
+    font-family:"nouveau_ibm";
+    src: url("/fonts/nouveau_ibm/Nouveau_IBM.ttf");
+}
+@font-face {
+    font-family:"symbolism";
+    src: url('/fonts/symbolism/Symbolism.ttf');
+}
+html,body {
+    height: 100%;
+    width: 100%;
+    background-color:white;
+    margin: 0px;
+}
+#body-ctr {
+    height: 100%;
+    width:100%;
+}
+.flex-ctr-v {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+.flex-ctr-h {
+    display: flex;
+}
+
+#index{
+    justify-content: space-around;
+    align-items: center;
+}
+#index:nth-child(2) {
+    flex: 1;
+}
+#home {
+    display: inline;
+    width:60px;
+    padding-top: 40px;
+    padding-right: 40px;
+    padding-left:40px;
+    cursor: zoom-in;
+}
+#routes li {
+    display: inline;
+    list-style-type: none;
+    font-size: 16px;
+}
+#routes {
+    opacity: 0;
+    padding-left: 0px;
+    margin-left: 0px;
+    margin-top:5px;
+    margin-bottom: 5px;
+}
+#routes:hover {
+    opacity: 1;
+}
+#routes a{ 
+    font-family: nouveau_ibm;
+    background-color:#000000;
+    color:#ffffff;
+    border: 1px;
+    margin-left: 1px;
+    padding:5px;
+    text-decoration: none;
+}
+#getRoutes { 
+    font-family: hyperspace;
+    background-color:#ffffff;
+    color:#000000;
+    border: 1px;
+    border-style: solid;
+    margin-left: 20px;
+    padding-bottom:4px;
+}
+footer {
+    flex: 0 0 auto;
+    font-family: nouveau_ibm;
+    font-size: 8px;
+    text-align: center;
+    margin: 0px;
+    padding:0px;
+}
+

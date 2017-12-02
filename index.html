@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!-- ./surf/index.html -->
+
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title> l'espace des phases </title>
+        
+        <link rel="stylesheet" href="/style/main.css"/>
+        <link rel="stylesheet" href="/style/hublot.css"/>
+        <link rel="stylesheet" href="/style/nav.css"/>
+        <link rel="stylesheet" href="/style/chart.css"/>
+        <link rel="stylesheet" href="/style/tmce.css"/>
+        
+        <!-- d3.js -->
+        <script src="/lib/d3/d3.min.js"></script>
+        <script src="https://d3js.org/d3-transition.v1.min.js"></script>
+        <script src="/lib/d3/d3-force.min.js"></script>
+        
+        <!-- Plotly BEFORE Mathjax -->
+        <script src="/lib/plotly/plotly-latest.min.js"></script>
+        
+        <!-- Mathjax CDN -->
+        <script src='/lib/mathjax/MathJax.js?config=TeX-AMS-MML_SVG'></script>
+        <!-- Let Mathjax typeset -->
+        <script>
+        MathJax.Hub.Queue( function () {
+           document.body.style.visibility = "visible";
+        });
+        </script>
+
+        <!-- TinyMCE -->
+        <script src='/lib/tinymce/js/tinymce/tinymce.min.js'></script>
+    <script>
+    </script>
+
+    </head>
+    
+    <body>
+        <div id="body-ctr" class="flex-ctr-h">       
+            <!-- LA BARRE DE NAV -->
+            <nav id="nav" class="flex-ctr-v">
+                <img 
+                id="home"
+                src="/images/Vinci_dodecahedron.png"
+                alt="dodecahedron"
+                onclick="toggleChart('home.html');"
+                />
+                <!--
+                <ul class="flex-ctr-v">
+                    <li><button> ACCUEIL </button></li>
+                    <li><button> A PROPOS </button></li>
+                    <li><button> CONNEXION </button></li>
+                </ul>
+                -->
+            </nav>
+
+            <div id="hublot-ctr">
+                <header class="flex-cell-v">
+                    <!-- LES ROUTES DU SURFEUR 
+                    <ul id="routes">    
+                        <li><button id="getRoutes">ROUTES:</button></li>
+                    </ul>
+                    -->
+                </header>
+            
+                    
+                <!-- LE HUBLOT DU SURFEUR -->
+                <div id="hublot" class="flex-ctr-h"></div> 
+    
+                <!--
+                <footer class="flex-cell-v">
+                   ~ ~ ~ 
+                </footer>
+                -->
+            </div>
+        </div>
+
+        <!-- LA CARTE -->
+        <div id="chart-ctr">
+            <h1> -- CARTE -- </h1>
+            <svg
+                id="chart"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"></svg> 
+            <script src="/hublot/chart.js"></script>
+        </div>
+        
+        <!-- LA PLANCHE DE SURF -->
+        <script src="/hublot/SURFER.js"></script>
+    
+    </body>
+</html>
+
