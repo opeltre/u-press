@@ -7,7 +7,7 @@ const path = require('path');
 const rdb = require('rethinkdb');
 const fs = require('fs');
 
-const html = fs.readFileSync("surf/index.html", "utf-8"); 
+const surf = require('./surf/head.js');
 
 // connect to rethinkdb
 var cxn;
@@ -17,7 +17,8 @@ var app = express();
 
 //@/
 app.get('/', (req, res) => {
-    res.redirect('/surf/index.html');
+    res.setHeader("Content-Type","text/html");
+    res.end(surf.dom.serialize());
 });
 
 //@rdb
