@@ -1,13 +1,13 @@
 // ./SERVER.js
 
-const STATIC = [];
+const STATIC = ['surf','media'];
 
 const express = require('express');
 const path = require('path');
 const rdb = require('rethinkdb');
 const fs = require('fs');
 
-//const html = fs.readFileSync("index.html", "utf-8"); 
+const html = fs.readFileSync("surf/index.html", "utf-8"); 
 
 // connect to rethinkdb
 var cxn;
@@ -46,4 +46,4 @@ app.use((req,res) => {
 //
 
 // listen on 80 as root
-app.listen(8082);
+app.listen(8080);
