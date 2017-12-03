@@ -1,0 +1,16 @@
+@font-face {
+    font-family:"hyperspace";
+    src: url("/media/fonts/hyperspace/Hyperspace_Bold.otf");
+}
+@font-face {
+    font-family:"libertine";
+    src: url("/media/fonts/LinLibertine/LinLibertine_Rah.ttf");
+}
+@font-face {
+    font-family:"nouveau_ibm";
+    src: url("/media/fonts/nouveau_ibm/Nouveau_IBM.ttf");
+}
+@font-face {
+    font-family:"symbolism";
+    src: url('/media/fonts/symbolism/Symbolism.ttf');
+}

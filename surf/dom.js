@@ -29,6 +29,4 @@ stylesheets.forEach( s => {
     doc.head.appendChild(sheet);
 });
 
-console.log(JSON.stringify(dom.serialize()));
-
 exports.dom = dom;
