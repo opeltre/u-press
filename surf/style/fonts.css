@@ -14,3 +14,15 @@
     font-family:"symbolism";
     src: url('/media/fonts/symbolism/Symbolism.ttf');
 }
+@font-face {
+    font-family:"bowman";
+    src: url('/media/fonts/bowman/Bowman.ttf');
+}
+@font-face {
+    font-family:"cone";
+    src: url('/media/fonts/cone/Cone.ttf');
+}
+@font-face {
+    font-family:"nimbus";
+    src: url('/media/fonts/nimbus/nimbusmono-regular.otf');
+}
