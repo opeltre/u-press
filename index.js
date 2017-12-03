@@ -7,7 +7,7 @@ const path = require('path');
 const rdb = require('rethinkdb');
 const fs = require('fs');
 
-const surf = require('./surf/head.js');
+const surf = require('./surf/dom.js');
 
 // connect to rethinkdb
 var cxn;
