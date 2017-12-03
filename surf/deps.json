@@ -1,0 +1,29 @@
+surfer_deps = [
+    
+    {
+        name: 'd3',
+        src: [ 
+            '/surf/d3/d3.min.js',
+            '/surf/d3/d3-force.min.js'
+        ]
+    },
+    
+    {
+        name: 'plotly',
+        src: '/surf/plotly/plotly-latest.min.js'
+    },
+    
+    {   
+        name: 'mathjax',
+        src: '/surf/mathjax/MathJax.js?config=TeX-AMS-MML_SVG'
+        script: 'MathJax.Hub.Queue(() => document.body.style.visibility = "visible");'
+    },
+    
+    {
+        name: 'simpleMde',
+        src: '/surf/simpleMde/simpleMde.min.js'
+    }
+
+]
+
+
