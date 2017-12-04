@@ -1,0 +1,40 @@
+header a { 
+    padding:5px;
+    margin-left: 1px;
+    font-family: nouveau_ibm;
+    font-size: 16px;
+    background-color:#000000;
+    color:#ffffff;
+    text-decoration: none;
+}
+
+header h1 {
+    font-family: nouveau_ibm;
+    font-size: 22px;
+    padding-top: 5px;
+    padding-left: 5px;
+    margin: 0px;
+}
+
+footer button {
+    background-color: #eee;
+    border: none;
+    padding: 5px;
+}
+
+footer input {
+    border: 1px solid #ddd;
+}
+
+footer {
+    font-family: nouveau_ibm;
+}
+
+footer button {
+    font-family: nouveau_ibm;
+}
+
+footer input {
+    font-family: nouveau_ibm;
+    color: #666;
+}

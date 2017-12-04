@@ -22,18 +22,38 @@
             <div id="page-ctr" class="flex-ctr-v">
 
                 <!-- Des boutons -->
-                <header class="flex-cell-v">
-                    <a>Accueil</a>
-                    <a>Attente</a>
-                    <a>Couloir</a>
+                <header class="flex-ctr-h">
+                    <h1>Scriptorium</h1>
+                    <span style="flex-grow:1"></span>
+                    <a href="http://you-talking-to-me.com">Accueil</a>
+                    <a href="http://geogoo.net">Attente</a>
+                    <a href="http://ctrlaltdel.org">Couloir</a>
+                    <a href="https://apod.nasa.gov/apod/random_apod.html">Sortie</a>
                 </header>
             
                 <!-- Le livre ouvert -->
                 <div id="page" class="flex-ctr-h">
                     Salut les moines!
-                </div> 
-    
+                </div>
+
+                <!-- D'autres boutons -->
+                <footer class="flex-ctr-h">
+                    <span id="desk">
+                        <button id="edit-btn" onclick="edit()">edit</button>
+                        <button id="post-btn" onclick="post()">post</button>
+                        <button id="view-btn" onclick="view()">view</button>
+                    </span>
+                    <span style="flex-grow:1"></span>
+                    <span>
+                        <input> O-  
+                    </span>
+                </footer>
             </div>
+
+            <!-- Marge à droite -->
+            <div id="r-margin">
+            </div>
+        
         </div>
     </body>
 </html>
