@@ -7,7 +7,7 @@ const path = require('path');
 const rdb = require('rethinkdb');
 const fs = require('fs');
 
-const surf = require('./dom.js');
+var view = require('./view.js');
 
 // connect to rethinkdb
 var cxn;
@@ -15,10 +15,14 @@ rdb.connect({host:'localhost', port:'28015'}, (e,c) => cxn = c);
 // launch the server 
 var app = express();
 
+let docs = JSON.parse(fs.readFileSync("docs.json","utf-8"));
+
 //@/
 app.get('/', (req, res) => {
+//    view.read("## Hey \n I'm using Markdown")
+    view.browse(docs);
     res.setHeader("Content-Type","text/html");
-    res.end(surf.dom.serialize());
+    res.end(view.dom.serialize());
 });
 
 //@rdb

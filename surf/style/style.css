@@ -21,6 +21,7 @@ header h1 {
 
 footer * {
     font-family: nouveau_ibm;
+    color: #684b27;
 }
 
 footer button {
@@ -30,9 +31,6 @@ footer button {
 }
 
 footer input {
-    border: 1px solid #ddd;
+    border: 1px solid #eee7df;
 }
 
-footer input {
-    color: #666;
-}

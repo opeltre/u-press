@@ -23,4 +23,4 @@ function post() {
     read(text);
 }
 
-document.addEventListener('DOMContentLoaded',main);
+// document.addEventListener('DOMContentLoaded',main);
