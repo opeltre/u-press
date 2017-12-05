@@ -12,8 +12,6 @@ function edit() {
     let text = page.html();
     page.html('');
     page.append('textarea')
-        .style('height','100%')
-        .style('width','100%')
         .html(text);
 }
 

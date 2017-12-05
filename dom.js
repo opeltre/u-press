@@ -1,4 +1,4 @@
-// /surf/dom.js
+// /surf/view.js
 
 const PREFIX = "/srv/http/scriptorium/surf/";
 const SURF = "/surf/";

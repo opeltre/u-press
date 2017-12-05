@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 //@rdb
 app.get('/rdb/*', (req,res) => {
     res.setHeader("Content-Type","text/plain");
-    rdb.table('booklets')
+    rdb.table('documents')
         .pluck('title','chapters')
         .run(cxn, (e,c) => {
             c.toArray( (e,r) => {
