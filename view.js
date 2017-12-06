@@ -13,8 +13,9 @@ const marked = require('marked');
 const deps = JSON.parse(fs.readFileSync(PREFIX + "deps.json","utf-8"));
 const style = fs.readdirSync(PREFIX + "style");
 const html = {
-    index: fs.readFileSync(PREFIX + "index.html","utf-8"),
-    scriptor: fs.readFileSync(PREFIX + "scriptor.html","utf-8")
+    index: fs.readFileSync(PREFIX + "index.html", "utf-8"),
+    scriptor: fs.readFileSync(PREFIX + "scriptor.html", "utf-8"),
+    login: fs.readFileSync(PREFIX + "login.html", "utf-8")
 };
 
 const Doc = {
@@ -26,11 +27,17 @@ const Section = {
     
 
 // module.exports:
+//  : view = require('./view.js');
+//  : html = view('index').browse(docs).dom.serialize();
+
+function ModView(name) {
+    return new View(name);
+}
+
 class View {
     
-    constructor () {
-        this.html = html;
-        this.dom = new JSDOM(html['index']);
+    constructor (name) {
+        this.dom = new JSDOM(name?html[name]:html['index']);
         this.doc = this.dom.window.document;
         deps.forEach( s => {
             var script = this.doc.createElement('script');
@@ -71,12 +78,19 @@ class View {
         return this;
     }
 
-    flush () {
-        this.d3('#page')
-            .html('');
+    /* > now unnecessary ?
+    login () {
+        this.d3('body').html(html['login']);
+    }
+
+    flush (name) {
+        this.d3('html').html(
+            name ? html[name] : html['index']
+        );
         return this;
     }
+    */
 
 };
 
-module.exports = new View();
+module.exports = ModView;

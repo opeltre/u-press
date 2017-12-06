@@ -2,27 +2,44 @@
 
 const STATIC = ['surf','media'];
 
-const express = require('express');
-const path = require('path');
-const rdb = require('rethinkdb');
 const fs = require('fs');
+const rdb = require('rethinkdb');
+const path = require('path');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-var view = require('./view.js');
+const view = require('./view.js');
 
-// connect to rethinkdb
+// some data
+let docs = JSON.parse(fs.readFileSync("docs.json","utf-8"));
+let users = JSON.parse(fs.readFileSync("users.json","utf-8"));
+
+// open a connexion to rethinkdb
 var cxn;
 rdb.connect({host:'localhost', port:'28015'}, (e,c) => cxn = c);
-// launch the server 
-var app = express();
 
-let docs = JSON.parse(fs.readFileSync("docs.json","utf-8"));
+// launch & configure the express server
+var app = express();
+app.use(bodyParser.urlencoded({extended:true}));
+STATIC.forEach((dir) => app.use('/'+dir, express.static(dir)))
 
 //@/
 app.get('/', (req, res) => {
-//    view.read("## Hey \n I'm using Markdown")
-    view.browse(docs);
-    res.setHeader("Content-Type","text/html");
-    res.end(view.dom.serialize());
+    res.end(view('login').dom.serialize());
+});
+
+//@login
+app.post('/login', (req, res) => {
+    console.log(`==LOGIN== \n usr:${req.body.usr} \n pwd:${req.body.pwd}`)
+    if ( users[req.body.usr]?1:0 && users[req.body.usr] == users[req.body.pwd] ) {
+        res.redirect('/read')
+    }
+    else { res.redirect('/') }
+});
+
+app.get('/read', (req,res) => {
+    let text = "# Hey\nI'm using Markdown!\n ## Yay :)";
+    res.end(view().read(text).dom.serialize());
 });
 
 //@rdb
@@ -36,11 +53,6 @@ app.get('/rdb/*', (req,res) => {
             });
         });
 });
-
-//@STATIC
-for ( i in STATIC ) {
-    app.use('/' + STATIC[i], express.static(STATIC[i]));
-}
 
 //@404
 app.use((req,res) => {

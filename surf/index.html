@@ -1,60 +1,54 @@
-<!DOCTYPE html>
-<!-- ./surf/index.html -->
+<head>
+    <meta charset="utf-8"/>
+    <title> Scriptorium </title>
+    <script src="/surf/desk.js"></script>
+</head>
 
-<html>
-    <head>
-        <meta charset="utf-8"/>
-        <title> Scriptorium </title>
-        <script src="/surf/desk.js"></script>
-    </head>
-    
-    <body>
-        <div id="body-ctr" class="flex-ctr-h">       
-            <!-- La barre de nav -->
-            <nav id="nav" class="flex-ctr-v">
-                <img 
-                id="home"
-                src="/media/images/Vinci_dodecahedron.png"
-                alt="dodecahedron"
-                onclick="toggleChart('home.html');"
-                />
-            </nav>
+<body>
+    <div id="body-ctr" class="flex-ctr-h">       
+        <!-- La barre de nav -->
+        <nav id="nav" class="flex-ctr-v">
+            <img 
+            id="home"
+            src="/media/images/Vinci_dodecahedron.png"
+            alt="dodecahedron"
+            onclick="toggleChart('home.html');"
+            />
+        </nav>
 
-            <div id="page-ctr" class="flex-ctr-v">
+        <div id="page-ctr" class="flex-ctr-v">
 
-                <!-- Des boutons -->
-                <header class="flex-ctr-h">
-                    <h1>Scriptorium</h1>
-                    <span style="flex-grow:1"></span>
-                    <a href="http://you-talking-to-me.com">Accueil</a>
-                    <a href="http://geogoo.net">Attente</a>
-                    <a href="http://ctrlaltdel.org">Couloir</a>
-                    <a href="https://apod.nasa.gov/apod/random_apod.html">Sortie</a>
-                </header>
-            
-                <!-- Le livre ouvert -->
-                <div id="page">
-                </div>
-
-                <!-- D'autres boutons -->
-                <footer class="flex-ctr-h">
-                    <span id="desk">
-                        <button id="edit-btn" onclick="edit()">edit</button>
-                        <button id="post-btn" onclick="post()">post</button>
-                        <button id="view-btn" onclick="view()">view</button>
-                    </span>
-                    <span style="flex-grow:1"></span>
-                    <span>
-                        <input> O-  
-                    </span>
-                </footer>
-            </div>
-
-            <!-- Marge à droite -->
-            <div id="r-margin">
-            </div>
+            <!-- Des boutons -->
+            <header class="flex-ctr-h">
+                <h1>Scriptorium</h1>
+                <span style="flex-grow:1"></span>
+                <a href="http://you-talking-to-me.com">Accueil</a>
+                <a href="http://geogoo.net">Attente</a>
+                <a href="http://ctrlaltdel.org">Couloir</a>
+                <a href="https://apod.nasa.gov/apod/random_apod.html">Sortie</a>
+            </header>
         
-        </div>
-    </body>
-</html>
+            <!-- Le livre ouvert -->
+            <div id="page">
+            </div>
 
+            <!-- D'autres boutons -->
+            <footer class="flex-ctr-h">
+                <span id="desk">
+                    <button id="edit-btn" onclick="edit()">edit</button>
+                    <button id="post-btn" onclick="post()">post</button>
+                    <button id="view-btn" onclick="view()">view</button>
+                </span>
+                <span style="flex-grow:1"></span>
+                <span>
+                    <input> O-  
+                </span>
+            </footer>
+        </div>
+
+        <!-- Marge à droite -->
+        <div id="r-margin">
+        </div>
+    
+    </div>
+</body>
