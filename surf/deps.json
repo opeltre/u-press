@@ -14,6 +14,11 @@
         "src": "mathjax/MathJax.js?config=TeX-AMS-MML_SVG",
         "script": "MathJax.Hub.Queue(() => document.body.style.visibility = 'visible');"
     },
+
+    {
+        "name": "marked",
+        "src":"marked/marked.min.js"
+    },
     
     {
         "name": "simpleMde",

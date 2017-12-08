@@ -1,6 +1,7 @@
 <head>
     <meta charset="utf-8"/>
     <title> Scriptorium </title>
+    <script src="/surf/ajax.js"></script>
     <script src="/surf/desk.js"></script>
 </head>
 
@@ -35,9 +36,8 @@
             <!-- D'autres boutons -->
             <footer class="flex-ctr-h">
                 <span id="desk">
-                    <button id="edit-btn" onclick="edit()">edit</button>
-                    <button id="post-btn" onclick="post()">post</button>
-                    <button id="view-btn" onclick="view()">view</button>
+                    <button id="mode-btn" onclick="page.modeSwitch()">edit</button>
+                    <button id="post-btn" onclick="page.post()">post</button>
                 </span>
                 <span style="flex-grow:1"></span>
                 <span>

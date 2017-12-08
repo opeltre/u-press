@@ -1,0 +1,62 @@
+<div id="login-ctr">
+    <img src="/media/images/stMathieu.jpg"
+         alt="Saint Mathieu au scriptorium"
+    />
+    
+    <form action="/login" method="post">
+        <fieldset>
+            <legend align="right">login</legend>
+            <div>
+                <label for="usr"> usr: </label>
+                <input name="usr"/>
+            </div>
+            <div>
+                <label for="pwd"> pwd: </label>
+                <input name="pwd" type="text"/>
+            </div>
+            <div>
+                <input align="right" type="submit" value=">"/>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+<style>
+html, body {
+    height: 100%;
+}
+#login-ctr {
+    height: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+}
+#login-ctr > * {
+    padding: 20px;
+}
+img {
+    width:300px;
+    max-width:40%;
+}
+fieldset {
+    padding-bottom: 5px;
+}
+legend {
+    font-family: bowman;
+}
+form label {
+    font-family: nouveau_ibm;
+}
+form input {
+    border: none;
+    font-family: bowman;
+}
+[name="pwd"] {
+    color: white;
+}
+[type="submit"] {
+    float: right;
+    padding-bottom:3px;
+}
+</style>

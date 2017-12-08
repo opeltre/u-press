@@ -13,6 +13,7 @@ const view = require('./view.js');
 // some data
 let docs = JSON.parse(fs.readFileSync("docs.json","utf-8"));
 let users = JSON.parse(fs.readFileSync("users.json","utf-8"));
+let text = "# Hey\nI'm using Markdown!\n## Yay :)";
 
 // open a connexion to rethinkdb
 var cxn;
@@ -21,6 +22,7 @@ rdb.connect({host:'localhost', port:'28015'}, (e,c) => cxn = c);
 // launch & configure the express server
 var app = express();
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
 STATIC.forEach((dir) => app.use('/'+dir, express.static(dir)))
 
 //@/
@@ -37,9 +39,18 @@ app.post('/login', (req, res) => {
     else { res.redirect('/') }
 });
 
+//@read
+
 app.get('/read', (req,res) => {
-    let text = "# Hey\nI'm using Markdown!\n ## Yay :)";
     res.end(view().read(text).dom.serialize());
+});
+app.get('/read/md', (req,res) => {
+    res.setHeader("Content-Type","text/plain");
+    res.end(text);
+});
+app.post('/read', (req,res) => {
+    [text] = req.body;
+    res.redirect(req.url);
 });
 
 //@rdb
