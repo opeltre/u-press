@@ -1,6 +1,6 @@
 // ./SERVER.js
 
-const STATIC = ['surf','media'];
+const STATIC = ['surf','media','audio'];
 
 const fs = require('fs');
 const rdb = require('rethinkdb');
@@ -10,10 +10,16 @@ const bodyParser = require('body-parser');
 
 const view = require('./view.js');
 
+console.log('... jam load');
+const jam = require('jam')
+//const jammd = fs.readFileSync("jam/jam.md","utf-8");
+
+console.log(jam.parse("# Salut\n\n C'est du texte a la mano\n\nbye"));
+
 // some data
 let docs = JSON.parse(fs.readFileSync("docs.json","utf-8"));
 let users = JSON.parse(fs.readFileSync("users.json","utf-8"));
-let text = "# Hey\nI'm using Markdown!\n## Yay :)";
+let text = fs.readFileSync("math.md","utf-8");
 
 // open a connexion to rethinkdb
 var cxn;

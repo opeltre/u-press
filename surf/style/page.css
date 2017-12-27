@@ -16,6 +16,11 @@
     font-family: bowman;
 }
 
+#page pre {
+    font-family: bowman;
+    background-color: #fff8e7;
+}
+
 .doc a, .section a {
     text-decoration: none;
 }

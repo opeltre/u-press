@@ -9,8 +9,7 @@ const { JSDOM } = require('jsdom');
 const d3 = require('d3');
 const marked = require('marked');
 
-// sync load resources:
-const deps = JSON.parse(fs.readFileSync(PREFIX + "deps.json","utf-8"));
+// sync load resources 
 const style = fs.readdirSync(PREFIX + "style");
 const html = {
     index: fs.readFileSync(PREFIX + "index.html", "utf-8"),
@@ -39,11 +38,6 @@ class View {
     constructor (name) {
         this.dom = new JSDOM(name?html[name]:html['index']);
         this.doc = this.dom.window.document;
-        deps.forEach( s => {
-            var script = this.doc.createElement('script');
-            script.src = SURF + s.src;
-            this.doc.head.appendChild(script);
-        });
         style.forEach( s => {
             var sheet = this.doc.createElement('link');
             sheet.rel = "stylesheet";

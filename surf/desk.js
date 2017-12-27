@@ -35,7 +35,7 @@ class Page {
     }
     
     view () {           // preview edit 
-        d3.select('#page').html(marked(this.read().text));
+        d3.select('#page').html(Jam.parse(this.read().text));
         MathJax.Hub.Queue(['Typeset',MathJax.Hub,'page']);
         return this;
     }
@@ -51,6 +51,6 @@ class Page {
     }
     
 }
-        
+
 var page = null;
 document.addEventListener('DOMContentLoaded', () => page = new Page());
