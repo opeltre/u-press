@@ -7,7 +7,7 @@ const SURF = "/surf/";
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const d3 = require('d3');
-const marked = require('marked');
+const jam = require('jam');
 
 // sync load resources 
 const style = fs.readdirSync(PREFIX + "style");
@@ -68,7 +68,7 @@ class View {
 
     read (text) {
         this.d3('#page')
-            .html(marked(text));
+            .html(jam.parse(text));
         return this;
     }
 
