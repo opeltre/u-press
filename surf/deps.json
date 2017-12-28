@@ -16,13 +16,18 @@
     },
 
     {
-        "name": "marked",
-        "src":"marked/marked.min.js"
+        "name": "jam",
+        "src":"JAM.js"
     },
     
     {
-        "name": "simpleMde",
-        "src": "simplemde/dist/simplemde.min.js"
+        "name": "ajax",
+        "src": "ajax.js"
+    },
+
+    {
+        "name": "desk",
+        "src": "desk.js"
     }
 ]
 

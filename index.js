@@ -2,24 +2,19 @@
 
 const STATIC = ['surf','media','audio'];
 
+const jam = require('jam')
+const view = require('./view.js');
+
 const fs = require('fs');
 const rdb = require('rethinkdb');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const view = require('./view.js');
-
-console.log('... jam load');
-const jam = require('jam')
-//const jammd = fs.readFileSync("jam/jam.md","utf-8");
-
-console.log(jam.parse("# Salut\n\n C'est du texte a la mano\n\nbye"));
-
 // some data
-let docs = JSON.parse(fs.readFileSync("docs.json","utf-8"));
-let users = JSON.parse(fs.readFileSync("users.json","utf-8"));
-let text = fs.readFileSync("math.md","utf-8");
+let docs = JSON.parse(fs.readFileSync("data/docs.json","utf-8"));
+let users = JSON.parse(fs.readFileSync("data/users.json","utf-8"));
+let text = fs.readFileSync("data/math.md","utf-8");
 
 // open a connexion to rethinkdb
 var cxn;
@@ -31,24 +26,12 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 STATIC.forEach((dir) => app.use('/'+dir, express.static(dir)))
 
-//@/
-app.get('/', (req, res) => {
-    res.end(view('login').dom.serialize());
-});
-
-//@login
-app.post('/login', (req, res) => {
-    console.log(`==LOGIN== \n usr:${req.body.usr} \n pwd:${req.body.pwd}`)
-    if ( users[req.body.usr]?1:0 && users[req.body.usr] == users[req.body.pwd] ) {
-        res.redirect('/read')
-    }
-    else { res.redirect('/') }
-});
+//@root
+app.get('/', (req, res) => res.redirect('read') )
 
 //@read
-
 app.get('/read', (req,res) => {
-    res.end(view().read(text).dom.serialize());
+    res.end(view().read(text).render());
 });
 app.get('/read/md', (req,res) => {
     res.setHeader("Content-Type","text/plain");
@@ -57,6 +40,31 @@ app.get('/read/md', (req,res) => {
 app.post('/read', (req,res) => {
     [text] = req.body;
     res.redirect(req.url);
+});
+
+//@browse
+app.get('/browse', (req,res) => {
+    rdb.table("documents")
+        .filter(req.query)
+        .run(cxn, (e,c) => {
+            if (e) throw e;
+            c.toArray( (e,r) => {
+                res.end(JSON.stringify(r,null,2));
+            });
+        });
+});
+//    res.end(view().browse(docs).render());
+
+//@login
+app.get('/login', (req, res) => {
+    res.end(view('login').dom.serialize());
+});
+app.post('/login', (req, res) => {
+    console.log(`==LOGIN== \n usr:${req.body.usr} \n pwd:${req.body.pwd}`)
+    if ( users[req.body.usr]?1:0 && users[req.body.usr] == users[req.body.pwd] ) {
+        res.redirect('/read')
+    }
+    else { res.redirect('/') }
 });
 
 //@rdb
