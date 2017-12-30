@@ -1,11 +1,6 @@
 <head>
     <meta charset="utf-8"/>
-    <title> Scriptorium </title>
-    <script src="/surf/d3/d3.min.js"></script>
-    <script src="/surf/mathjax/MathJax.js?config=TeX-AMS-MML_SVG"></script>
-    <script src="/surf/JAM.js"></script>
-    <script src="/surf/ajax.js"></script>
-    <script src="/surf/desk.js"></script>
+    <title> u-press.it </title>
 </head>
 
 <body>
@@ -14,7 +9,7 @@
         <nav id="nav" class="flex-ctr-v">
             <img 
             id="home"
-            src="/media/images/Vinci_dodecahedron.png"
+            src="/surf/media/images/Vinci_dodecahedron.png"
             alt="dodecahedron"
             onclick="toggleChart('home.html');"
             />
@@ -24,7 +19,7 @@
 
             <!-- Des boutons -->
             <header class="flex-ctr-h">
-                <h1>Scriptorium</h1>
+                <h1>u-press.it</h1>
                 <span style="flex-grow:1"></span>
                 <a href="http://you-talking-to-me.com">Accueil</a>
                 <a href="http://geogoo.net">Attente</a>
@@ -38,12 +33,18 @@
 
             <!-- D'autres boutons -->
             <footer class="flex-ctr-h">
-                <span id="desk">
+                <span id="desk" class="read">
                     <button id="mode-btn" onclick="page.modeSwitch()">edit</button>
                     <button id="post-btn" onclick="page.post()">post</button>
                 </span>
+                <span id="surfing" class="browse">
+                    <button onclick="surfer.rise()"> < </button>
+                    <button onclick="surfer.dive()"> > </button>
+                    <button onclick="surfer.add()"> + </button>
+                    <button onclick="surfer.del()"> - </button>
+                </span>
                 <span style="flex-grow:1"></span>
-                <span>
+                <span id="search">
                     <input> O-  
                 </span>
             </footer>

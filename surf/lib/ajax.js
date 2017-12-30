@@ -5,27 +5,44 @@
 const ajax = () => {
     return new Ajax();
 }
+
 class Ajax {
     
     constructor () {
         this.xhr = new XMLHttpRequest();
-        this.data = null;
     }
     
     get (url) {
         this.xhr.open('GET',url);
-        return this;
+        return this.promise();
     }
     
     post (url, data) {
         this.xhr.open('POST', url);
+        return this.fill(data).promise();
+    }
+
+    del (url, data) {
+        this.xhr.open('DELETE', url);
+        return this.fill(data).promise();
+    }
+
+    put (url, data) {
+        this.xhr.open('PUT', url);
+        return this.fill(data).promise();
+    }
+
+    promise () {
+        return new Promise(resolve => this.then(resolve));
+    }
+    
+    fill (data) {
         this.data = data;
         this.xhr.setRequestHeader('Content-Type','application/json');
         return this;
     }
-    
-    then (callback) {
-        var f = callback || (() => null);
+
+    then (f) {
         this.xhr.onreadystatechange = () => {
             this.ok() && f(this.xhr.responseText);
         }
