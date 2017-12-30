@@ -1,6 +1,6 @@
 // ./nav.js
 
-function tree (d3s, docs) => {
+const tree = (d3s, docs) => {
     
     d3s.selectAll('.doc')
         .data(docs)

@@ -1,34 +1,25 @@
 [
     {
         "name": "d3",
-        "src": "d3/d3.min.js"
-    },
-    
-    {
-        "name": "plotly",
-        "src": "plotly/plotly-latest.min.js"
+        "src": "dist/d3/d3.min.js"
     },
     
     {   
         "name": "mathjax",
-        "src": "mathjax/MathJax.js?config=TeX-AMS-MML_SVG",
+        "src": "dist/mathjax/MathJax.js?config=TeX-AMS-MML_SVG",
         "script": "MathJax.Hub.Queue(() => document.body.style.visibility = 'visible');"
     },
 
     {
         "name": "jam",
-        "src":"JAM.js"
+        "src":"lib/JAM.js"
     },
     
     {
         "name": "ajax",
-        "src": "ajax.js"
-    },
-
-    {
-        "name": "desk",
-        "src": "desk.js"
+        "src": "lib/ajax.js"
     }
+
 ]
 
 

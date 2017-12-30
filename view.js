@@ -1,13 +1,18 @@
 // ./view.js
 //  
 //  : view = require('./view.js');
-//  : html = view('index').browse(docs).render();
+//  : html = view('read').render(text);
+//  : html = view('nav').render(docs);
 
 const PREFIX = "/srv/http/scriptorium/surf/";
 const SURF = "/surf/";
 
 function ModView(name) {
-    return new View(name);
+    var Views = { 
+        read : View_read,
+        nav : View_nav
+    }
+    return new ( Views[name] || View ) ();
 }
 
 // imports
@@ -36,8 +41,12 @@ class View {
         return this;
     }
 
-    render() {
-        return this.dom.serialize();
+    bind() {
+        return this;
+    }
+
+    render(...data) {
+        return this.bind(...data).dom.serialize();
     }
 
     style (s) {
@@ -49,7 +58,7 @@ class View {
 
     script (s) {
         var script = this.doc.createElement('script');
-        script.src = SURF + "lib/" + s;
+        script.src = SURF + s;
         this.doc.head.appendChild(script);
     }
 
@@ -57,6 +66,19 @@ class View {
         return d3.select(this.doc).select(selector);
     }
 
+}
+
+class View_read extends View {
+
+    constructor () {
+        super();
+        this.script("lib/desk.js");
+    }
+    
+    bind (text) {
+        return this.read(text);
+    }
+    
     read (text) {
         this.d3('.browse').remove();
         this.d3('#page')
@@ -64,13 +86,28 @@ class View {
         return this;
     }
 
-    browse (docs) {
+}
+
+class View_nav extends View {
+
+    constructor () {
+        super();
+        this.script("lib/surfer.js");
+    }
+
+    bind (doc) {
+        return this.browse(doc);
+    }
+    
+    browse (doc) {
         this.d3('.read').remove();
         this.d3('#page')
-            .call(nav, docs);
+            .append('pre').append('code')
+            .html(JSON.stringify(doc, null, 2));
+            //.call(nav, doc);
         return this;
     }
     
-};
+}
 
 module.exports = ModView;
