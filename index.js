@@ -11,11 +11,6 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-// some data
-let docs = JSON.parse(fs.readFileSync("data/docs.json","utf-8"));
-let users = JSON.parse(fs.readFileSync("data/users.json","utf-8"));
-let text = fs.readFileSync("data/math.md","utf-8");
-
 // launch & configure the express server
 var app = express();
 app.use(bodyParser.urlencoded({extended:true}));
@@ -28,8 +23,10 @@ app.get('/', (req, res) => res.redirect('read') )
 
 ////////////// @ read
 
-app.get('/read', (req,res) => {
-    res.end(view('read').render(text));
+app.get('/read*', (req,res) => {
+    db.doc
+        .get(req.params[0])
+        .then(doc => res.end(view('read').render(doc.text)));
 });
 
 app.get('/read/md', (req,res) => {
@@ -37,9 +34,11 @@ app.get('/read/md', (req,res) => {
     res.end(text);
 });
 
-app.post('/read', (req,res) => {
+app.post('/read*', (req,res) => {
     [text] = req.body;
-    res.redirect(req.url);
+    db.doc
+        .write(req.params[0],text)
+        .then(() => res.end('write'));
 });
 
 ////////////// @ browse --> db.js
@@ -48,6 +47,7 @@ app.get('/browse*', (req,res) => {
     db.doc
         .get(req.params[0])
         .then(doc => res.end(view('nav').render(doc)))
+        .catch( err => res.end(`document may not exist\n\n${err}`))
 });
 
 app.put('/browse*', (req,res) => {

@@ -16,7 +16,6 @@ function ModView(name) {
 }
 
 // imports
-const nav = require('./nav');
 const jam = require('jam');
 
 const fs = require('fs');
@@ -56,10 +55,11 @@ class View {
         this.doc.head.appendChild(sheet);
     }
 
-    script (s) {
+    script (s, selector) {
+        var node = this.doc.querySelector(selector || 'head')
         var script = this.doc.createElement('script');
         script.src = SURF + s;
-        this.doc.head.appendChild(script);
+        node.appendChild(script);
     }
 
     d3 (selector) {
@@ -82,7 +82,7 @@ class View_read extends View {
     read (text) {
         this.d3('.browse').remove();
         this.d3('#page')
-            .html(jam.parse(text));
+            .html(text);
         return this;
     }
 
@@ -92,19 +92,15 @@ class View_nav extends View {
 
     constructor () {
         super();
-        this.script("lib/surfer.js");
     }
 
     bind (doc) {
-        return this.browse(doc);
-    }
-    
-    browse (doc) {
         this.d3('.read').remove();
         this.d3('#page')
-            .append('pre').append('code')
-            .html(JSON.stringify(doc, null, 2));
-            //.call(nav, doc);
+            .append('pre').attr('class','data')
+            .append('code')
+                .html(JSON.stringify(doc, null, 2));
+        this.script('lib/nav.js','#page');
         return this;
     }
     

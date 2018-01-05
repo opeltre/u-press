@@ -336,13 +336,19 @@ var c = jam.tok('code',/`{3,}/, /./, "esc stop", [/./])
         c.val.push(new RegExp(a)); 
         c.test('close', self => c.val[self.val.length - 1]);
     })
-    .on('close', () => c.val.pop() );
+    .on('close', () => c.val.pop() )
+    .render('open',() => ["<pre><code>", ''])
+    .render('close',() => ["</pre></code>",'']);
 
 var d = jam.tok('def', /^~{3,}(\w*)/, /^~{3,}/, "stop")
     .render('open',(a,b,c) => [`<div class="def" name="def-${c}">`, b])
     .render('close', () => ["</div>",""]);
 
-var lex = jam.lex([q,h,c,b]);
+var eq = jam.tok('eq', /^'{3}\s*/, /^'{3}/, "stop")
+    .render('open', () => ["\\[",''])
+    .render('close', () => ["\\]",''])
+
+var lex = jam.lex([q,h,c,b,eq]);
 
 /* * * * * * * * * * * * *
  * PARAGRAPH RECOGNITION *
@@ -372,9 +378,12 @@ var lexL = jam.lex([inline,escaped]);
  * * * * * * * * * */
 var em = jam.tok('em',/^\*(?!\*)/, /\*(?!\*)$/, 'o_c' );
 var strong = jam.tok('strong',/^\*\*(?!\*)/,/\*\*(?!\*)$/, 'o_c');
-var eq = jam.tok('ieq',/^''/,/''$/, 'o_c esc');
 
-const lexI = () => jam.lex([em,strong,eq], "o_c");
+var ieq = jam.tok('ieq',/^''/,/''$/, 'o_c esc')
+    .render('open', (a,b) => ['\\(',b])
+    .render('close', (a,b) => ['\\)',b])
+
+const lexI = () => jam.lex([em,strong,ieq], "o_c");
 
 exports.A = lex;
 exports.B = lexP;

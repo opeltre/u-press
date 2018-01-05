@@ -4,8 +4,8 @@ class Page {
     
     constructor () {
         this.mode = 'r';
-        this.text = null;
-        this.get()
+        this.text = d3.select('#page').html();
+        d3.select('#page').html(Jam.parse(this.text));
     }
 
     modeSwitch () {
@@ -43,11 +43,11 @@ class Page {
     post () {           // post edit
         var data = JSON.stringify([this.read().text])
         console.log(data);
-        ajax().post(window.location,data).then((res) => window.location.reload());
+        ajax().post(window.location,data).then(res => window.location.reload());
     }
 
     get () {
-        ajax().get(window.location+'/md').then((res) => this.text = res);
+        ajax().get(window.location+'/md').then(res => this.text = res);
     }
     
 }

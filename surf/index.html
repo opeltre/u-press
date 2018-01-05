@@ -11,8 +11,16 @@
             id="home"
             src="/surf/media/images/Vinci_dodecahedron.png"
             alt="dodecahedron"
-            onclick="toggleChart('home.html');"
+            onclick="homeBtn(window.location.pathname)"
             />
+    <script>
+        function homeBtn (url) {
+            /read/.test(url)
+                ? url = url.replace('read','browse')
+                : url = url.replace('browse','read');
+            window.location = url;
+        }
+    </script>
         </nav>
 
         <div id="page-ctr" class="flex-ctr-v">
@@ -21,8 +29,8 @@
             <header class="flex-ctr-h">
                 <h1>u-press.it</h1>
                 <span style="flex-grow:1"></span>
-                <a href="http://you-talking-to-me.com">Accueil</a>
-                <a href="http://geogoo.net">Attente</a>
+                <a href="http://geogoo.net">Accueil</a>
+                <a href="http://you-talking-to-me.com">Aide</a>
                 <a href="http://ctrlaltdel.org">Couloir</a>
                 <a href="https://apod.nasa.gov/apod/random_apod.html">Sortie</a>
             </header>
@@ -38,10 +46,10 @@
                     <button id="post-btn" onclick="page.post()">post</button>
                 </span>
                 <span id="surfing" class="browse">
-                    <button onclick="surfer.rise()"> < </button>
-                    <button onclick="surfer.dive()"> > </button>
-                    <button onclick="surfer.add()"> + </button>
-                    <button onclick="surfer.del()"> - </button>
+                    <button onclick="nav.rise()"> < </button>
+                    <button onclick="nav.read()"> /0-0\ </button>
+                    <button onclick="nav.del()"> - </button>
+                    <button onclick="nav.add()"> + </button>
                 </span>
                 <span style="flex-grow:1"></span>
                 <span id="search">

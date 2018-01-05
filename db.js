@@ -25,11 +25,11 @@ const Doc = {
     
     get : (url) => {
 
-         return rdb.table('documents')
-            .get(url)
-            .run(cxn)
+         return rdb.table('documents').get(url).merge(
+             d=>({children: d('children').map(c => rdb.table('documents').get(c))})
+         ).run(cxn)
     },
-    
+
     put : (url, name) => {
         
         var doc = Doc.init(url, name);
@@ -43,6 +43,12 @@ const Doc = {
             .then(Doc.unlinkChild)
             .then(doc => Doc.dive([doc]))
             .then(Doc.deleteDocs)
+    },
+
+    write: (url, text) => {
+        return rdb.table('documents').get(url)
+            .update({text: text})
+            .run(cxn);
     },
     // ---> User
     
@@ -69,7 +75,7 @@ const Doc = {
 
         return rdb.table('documents').get(doc.parent)
             .update(
-                p => ({children: p.getField('children').filter(x => x.ne(doc.url))})
+                p => ({children: p('children').filter(x => x.ne(doc.url))})
             )
             .run(cxn)
             .then(() => doc)

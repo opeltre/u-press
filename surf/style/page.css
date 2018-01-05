@@ -21,7 +21,7 @@
     background-color: #fff8e7;
 }
 
-.doc a, .section a {
+.doc a, .child a {
     text-decoration: none;
 }
 
@@ -29,6 +29,16 @@
     color: #774545;
 }
 
-.section a {
+.child a {
     color: #6b5a53;
+    padding-left: 50px;
+}
+
+#askName {
+    padding-left: 5px;
+}
+
+#askName input {
+    text-align: right;
+    width: 120px;
 }
