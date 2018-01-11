@@ -1,78 +1,169 @@
-class Nav {
+// ./surf/lib/nav.js
+function Nav () {
 
-    constructor (raw) {
+/* nav panel:
+ *
+ *  : var nav = Nav().lvl(2)
+ *  : d3.select('#route')
+ *  :   .call(nav);
+ */
+    
+    var self = {
+        show: false,
+        route: '/',
+        lvl: 2,
+//        ctlr: surf
+    };
 
-        this.raw = raw || false;
-        this.doc = JSON.parse(d3.select('.data code').html());
-        d3.select('.data').remove();
-        console.log(this.doc);
-        this.render();
+    function my (selection) {
+        my.selection = selection.call(flush);
+        ajax().get('/route'+ self.route)
+            .then(d => my.draw(JSON.parse(d)));
     }
 
-    render () {
-        d3.select('#page').append('h2')
-            .attr('class','doc')
-            .html(Nav.docRdr(this.doc));
-        d3.selectAll('#page').selectAll('.child').data(this.doc.children)
-            .enter().append('h3')
-                .attr('class','child')
-                .html(d => Nav.docRdr(d));
-    }
+    my.draw = (tree) => {
+        // nav items: documents dirtree
+        my.selection.selectAll(`.nav${self.lvl}`)
+            .data([tree])
+            .enter().append('div')
+                .attr('class',`.nav${self.lvl}`)
+                .call(NavItem(self.lvl).lvl(self.lvl));
+        // nav controls: put, delete & co
+        var btns = {
+            ' + ': my.put,
+            ' - ': my.del
+        };
+        my.selection
+            .append('div').property('id', 'nav-ctl')
+            .call(Ctl().buttons(btns));
+    };
 
-    static docRdr (doc) {
-        return `<a href="/browse${doc.url}">${doc.name}</a>`;
-    }
-
-    add () {
-
-        this.askName(n => this.put(n));
-    }
-
-    put (name) {
-        
+    my.put = () => {
+        var data = {name: prompt('name it','')};
         return ajax()
-            .put(window.location, JSON.stringify({name:name}))
-            .then(res => { res == 'put'
-                ? window.location = window.location
-                : alert(res);
-            });
-    }
+            .put('/route'+self.route, JSON.stringify(data))
+            .then(res => alert(res))
+    };
 
-    del () {
-        if (this.doc.url == "/") {
-            return Promise.resolve().then(() => alert("don't do it"));
+    my.del = () => {
+        if (self.route == '/') return alert("don't do it!");
+        return ajax()
+            .del('/route'+self.route)
+            .then(res => alert('/route'+self.route+'\n'+JSON.stringify(res)));
+    };
+    
+    return getset(my, self);
+}
+
+function NavItem (depth) {
+
+/* nav item: spawned by Nav
+ *
+ *  : d3.select('#route').data(tree).call(NavItem(1).lvl(2))
+ */  
+    var self = {
+        lvl: 0,
+        expanded: depth ? true : false,
+        style: {
+            'font-family': 'bowman',
+            'font-size': my => (14 + 4 * my.lvl()),
+            'margin': 5,
+            'margin-left': 30,
+            'color': 'black'
         }
-        return ajax()
-            .del(window.location)
-            .then( res => {
-                d3.select('#page')
-                    .append('pre').append('code')
-                    .html(res);
-                setTimeout(() => window.location = "/browse"+this.doc.parent, 2000);
-            })
+    };
+    
+    function my (selection) {
+        my.selection = selection
+            .call(style, my)
+        my.selection.append('span')
+            .html('+ ')
+            .on('click', (d) => self.expanded ? my.retract() : my.expand())
+        my.selection.append('span')
+            .html(d => d.name)
+            .on('click', d => alert(d.url));
+        // expand it
+        if (depth && self.lvl > 0) 
+            my.expand(depth - 1);
     }
 
-    rise () {
-        window.location = '/browse' + (this.doc.parent || "/");
-    }
+    my.expand = (depth) => {
+        if (self.lvl === 0) return my;
+        my.selection
+            .selectAll(`.nav${self.lvl-1}`)
+            .data(d => d.children)
+            .enter().append('div')
+                .attr('class',`nav${self.lvl-1}`)
+                .each(function () {
+                    d3.select(this).call(NavItem(depth || 0).lvl(self.lvl-1));
+                });
+        self.expanded = true;
+        return my;
+    };
 
-    read () {
-        window.location = '/read' + this.doc.url;
-    }
+    my.retract = () => {
+        my.selection
+            .selectAll(`.nav${self.lvl-1}`)
+            .remove();
+        self.expanded = false;
+        return my;
+    };
 
-    askName (submit) {
-
-        var ctl = d3.select('footer')
-            .insert('span','#surfing + *')
-            .attr('id','askName');
-        var input = ctl.insert('input');
-        ctl.insert('button')
-            .html('put')
-            .on('click', () => submit(input.property('value')) )
-    }
+    return getset(my, self);
 
 }
 
-console.log(Nav.docRdr({name:"u-press",url:"u-press.it"}));
+function Ctl () {
+    
+    self = { 
+        buttons: {'btn': () => alert('uclick')} 
+    } 
 
-var nav = new Nav({});
+    function my (selection) {
+        self.buttons = Object.keys(self.buttons)
+            .map(k => ({html: k, onclick: self.buttons[k]}))
+        selection
+            .selectAll('button')
+            .data(self.buttons)
+            .enter().append('button')
+                .html(d => d.html)
+                .on('click', d => d.onclick())
+    }
+    
+    return getset(my, self);
+
+}
+
+/********************************/
+/****** helper functions ********/
+
+function getset (obj, attrs) {
+    
+    Object.keys(attrs).forEach(
+        key => obj[key] = function (val) {
+            if (!arguments.length) return attrs[key];
+            attrs[key] = val;
+            return obj;
+        }
+    );
+    return obj;
+}
+
+function style (selection, my) {
+    
+    var sheet = my.style();
+
+    Object.keys(sheet).forEach(
+        key => selection.style(
+            key, 
+            typeof sheet[key] == "function"
+                ? sheet[key](my)
+                : sheet[key]
+        )
+    );
+}
+
+function flush (selection) {
+    selection.selectAll('*').remove;
+}
+

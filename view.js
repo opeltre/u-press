@@ -72,6 +72,7 @@ class View_read extends View {
 
     constructor () {
         super();
+        this.script("lib/nav.js");
         this.script("lib/desk.js");
     }
     
@@ -100,7 +101,7 @@ class View_nav extends View {
             .append('pre').attr('class','data')
             .append('code')
                 .html(JSON.stringify(doc, null, 2));
-        this.script('lib/nav.js','#page');
+        this.script('lib/nav2.js','#page');
         return this;
     }
     

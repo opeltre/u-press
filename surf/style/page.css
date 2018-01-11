@@ -21,24 +21,3 @@
     background-color: #fff8e7;
 }
 
-.doc a, .child a {
-    text-decoration: none;
-}
-
-.doc a {
-    color: #774545;
-}
-
-.child a {
-    color: #6b5a53;
-    padding-left: 50px;
-}
-
-#askName {
-    padding-left: 5px;
-}
-
-#askName input {
-    text-align: right;
-    width: 120px;
-}

@@ -6,6 +6,8 @@ const ajax = () => {
     return new Ajax();
 }
 
+module.exports = ajax;
+
 class Ajax {
     
     constructor () {

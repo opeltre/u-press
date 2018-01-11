@@ -1,56 +1,68 @@
-// desk.js
+// ./surf/lib/desk.js
+//
+// depends on nav.js for now
+// (where getset lies...)
 
-class Page {
-    
-    constructor () {
-        this.mode = 'r';
-        this.text = d3.select('#page').html();
-        d3.select('#page').html(Jam.parse(this.text));
-    }
+const sleep = ms => new Promise(res => setTimeout(res, ms));
 
-    modeSwitch () {
-        if (this.mode == 'r') {
-            this.edit();
-            this.mode = 'w';
-            d3.select('#mode-btn').html('view');
-        } else {
-            this.view();
-            this.mode = 'r';
-            d3.select('#mode-btn').html('edit');
-        }
-    }
-    
-    read () { 
-        if (this.mode == 'w') {
-            this.text = d3.select('textarea').property('value');
-        }
-        return this;
+function Page () {
+
+/* page: retrieves documents via ajax before parsing them to html
+ * 
+ * controls better be optional
+ */
+
+    self = {
+        mode: 'r',
+        text: 'yoooo',
+        route: '/',
+        parser: jam.parse
     }
 
-    edit () {           // enter edit mode
-        d3.select('#page').html('')
-            .append('textarea')
-                .html(this.text);
-        return this;
-    }
-    
-    view () {           // preview edit 
-        d3.select('#page').html(Jam.parse(this.read().text));
-        MathJax.Hub.Queue(['Typeset',MathJax.Hub,'page']);
-        return this;
-    }
-        
-    post () {           // post edit
-        var data = JSON.stringify([this.read().text])
-        console.log(data);
-        ajax().post(window.location,data).then(res => window.location.reload());
+    function my (selection) {
+        my.selection = selection
+            .html(self.parser(this.text));
     }
 
-    get () {
-        ajax().get(window.location+'/md').then(res => this.text = res);
+    my.switch = () => {
+        return self.mode() == 'r'
+            ? my.mode('w').edit()
+            : my.mode('r').view();
     }
     
+    my.read = () => {
+        return my.mode == 'w' 
+            ? my.text(my.selection.select('textarea').html())
+            : my;
+    }
+
+    my.edit = () => {
+        my.selection.append('textarea')
+            .html(my.text());
+        return my;
+    }
+
+    my.view = () => {
+        my.selection.html(self.parser(my.read().text()));
+        return my;
+    }
+
+    my.post = () => {
+        var data = JSON.stringify(my.read().text());
+        return ajax()
+            .post('/doc' + self.route, data)
+            .then(res => {
+                console.log(res);
+                sleep(1000).then(window.location.reload)
+            });
+    }
+
+    my.get = () => {
+        return ajax()
+            .get('/doc' + self.route);
+    }
+    
+    return getset(my,self);
+
 }
-
-var page = null;
-document.addEventListener('DOMContentLoaded', () => page = new Page());
+                

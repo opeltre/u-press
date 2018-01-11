@@ -21,6 +21,10 @@ STATIC.forEach((dir) => app.use('/'+dir, express.static(dir)))
 
 app.get('/', (req, res) => res.redirect('read') )
 
+////////////// @ ip
+
+app.get('/ip', (req, res) => res.end(req.connection.remoteAddress));
+
 ////////////// @ read
 
 app.get('/read*', (req,res) => {
@@ -29,36 +33,40 @@ app.get('/read*', (req,res) => {
         .then(doc => res.end(view('read').render(doc.text)));
 });
 
-app.get('/read/md', (req,res) => {
+app.get('/raw*', (req,res) => {
     res.setHeader("Content-Type","text/plain");
-    res.end(text);
+    console.log(req.params[0]);
+    db.doc
+        .get(req.params[0])
+        .then(text => res.end(text));
 });
 
 app.post('/read*', (req,res) => {
     [text] = req.body;
     db.doc
-        .write(req.params[0],text)
+        .post(req.params[0],text)
         .then(() => res.end('write'));
 });
 
-////////////// @ browse --> db.js
+////////////// @ routen --> db.js
 
-app.get('/browse*', (req,res) => {
-    db.doc
+app.get('/route*', (req,res) => {
+    res.setHeader("Content-Type","application/json");
+    db.nav
         .get(req.params[0])
-        .then(doc => res.end(view('nav').render(doc)))
-        .catch( err => res.end(`document may not exist\n\n${err}`))
+        .then(doc => res.end(JSON.stringify(doc)))
+        .catch(err => res.end(JSON.stringify({error: `${err}`})));
 });
 
-app.put('/browse*', (req,res) => {
-    db.doc
+app.put('/route*', (req,res) => {
+    db.nav
         .put(req.params[0], req.body.name)
         .then(() => res.end('put'))
-        .catch(err => res.end('doc exists'));
+        .catch(err => res.end(JSON.stringify({error: `${err}`})));
 });
 
-app.delete('/browse*', (req,res) => {
-    db.doc
+app.delete('/route*', (req,res) => {
+    db.nav
         .del(req.params[0])
         .then(children => {
             res.setHeader("Content-Type","text/plain");

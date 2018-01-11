@@ -1,13 +1,12 @@
 [
     {
         "name": "d3",
-        "src": "dist/d3/d3.min.js"
+        "src": "dist/d3/d3.js"
     },
     
     {   
         "name": "mathjax",
-        "src": "dist/mathjax/MathJax.js?config=TeX-AMS-MML_SVG",
-        "script": "MathJax.Hub.Queue(() => document.body.style.visibility = 'visible');"
+        "src": "dist/mathjax/MathJax.js?config=TeX-AMS-MML_SVG"
     },
 
     {
@@ -16,8 +15,8 @@
     },
     
     {
-        "name": "ajax",
-        "src": "lib/ajax.js"
+        "name": "surf",
+        "src": "dist/bundle.js"
     }
 
 ]

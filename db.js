@@ -1,119 +1,132 @@
 const rdb = require('rethinkdb');
 
-var cxn;
-rdb.connect({host:'localhost', port:'28015'})
-    .then(c => cxn=c);
+class Doc {
 
-// promise | promise | promise
-const pipe = (p1, p2) => p1.then(p2);
-const pipeline = (...promises) => {
-    return (...x) => promises.reduce(pipe, Promise.resolve(...x));
+    constructor () {
+        this.cxn = null;
+        this.db = rdb.db('upress').table('doc');
+        rdb.connect({host:'localhost', port:'28015'})
+            .then(c => this.cxn = c);
+    }    
+
+    get (url) {
+        return this.db.get(url)
+            .run(this.cxn)
+            .then(doc => doc.text);
+    }
+
+    post (url, text) {
+        return this.db.get(url)
+            .update({text:text})
+            .run(this.cxn)
+    }
 }
 
-const Doc = { 
+class Nav { 
+
+    constructor () {
+        this.cxn = null;
+        this.db = rdb.db('upress').table('nav');
+        rdb.connect({host:'localhost', port:'28015'})
+            .then(c => this.cxn = c);
+    }        
     
-    init: (url, name) => { 
-        
+    init (url, name) { // data format
         return {
-            name: name,
             url: url + name.replace(/[^\w\s]/g,'').replace(/\s/g,'-') + '/',
+            name: name,
             parent: url,
-            children: [],
-            text: ''
-        }
-    },
-    
-    get : (url) => {
+            children: []
+        };
+    }
+   
+    // ---> User
+    get (url) {
+         return this.lvlGet(2)(url).run(this.cxn);
+    }
 
-         return rdb.table('documents').get(url).merge(
-             d=>({children: d('children').map(c => rdb.table('documents').get(c))})
-         ).run(cxn)
-    },
+    put (url, name) {
+        var doc = this.init(url, name);
+        console.log(doc);
+        return this.addChild(doc)
+            .then(doc => this.linkChild(doc));
+    }
 
-    put : (url, name) => {
-        
-        var doc = Doc.init(url, name);
-        return Doc.addChild(doc)
-            .then(Doc.linkChild)
-    },
-
-    del : (url) => {
-        return rdb.table('documents').get(url)
-            .run(cxn)
-            .then(Doc.unlinkChild)
-            .then(doc => Doc.dive([doc]))
-            .then(Doc.deleteDocs)
-    },
-
-    write: (url, text) => {
-        return rdb.table('documents').get(url)
-            .update({text: text})
-            .run(cxn);
-    },
+    del (url) {
+        return this.db.get(url).run(this.cxn)
+            .then(doc => this.unlinkChild(doc))
+            .then(doc => this.dive([doc]))
+            .then(docs => this.deleteDocs(docs));
+    }
     // ---> User
     
-    // <--- this
-    addChild : (doc) => {
-        
-        return rdb.table('documents').insert(doc)
-            .run(cxn)
+    // <--- Doc 
+    lvlGet (lvl) {
+        return (lvl == 0)
+	    ? url => this.db.get(url)
+            : url => this.db.get(url).merge(d => ({
+                    children: d('children').map(this.lvlGet(lvl-1)) 
+                }));
+    }
+
+    addChild (doc) {
+        return this.db.insert(doc)
+            .run(this.cxn)
             .then(res => {
+                console.log(res);
                 if (res.inserted == 1) return doc;
                 else throw new Error('! duplicate url !');
-            })
-    },
+            });
+    }
 
-    linkChild : (doc) => {
-        
-        return rdb.table('documents').get(doc.parent)
+    linkChild (doc) {
+        console.log(doc);
+        console.log(this);
+        return this.db.get(doc.parent)
             .update({children: rdb.row('children').append(doc.url)})
-            .run(cxn)
-            .then(() => doc)
-    },
+            .run(this.cxn).then(() => doc);
+    }
 
-    unlinkChild : (doc) => {
+    unlinkChild (doc) {
+        return this.db.get(doc.parent)
+            .update(p => ({children: p('children').filter(x => x.ne(doc.url))}))
+            .run(this.cxn).then(() => doc);
+    }
 
-        return rdb.table('documents').get(doc.parent)
-            .update(
-                p => ({children: p('children').filter(x => x.ne(doc.url))})
-            )
-            .run(cxn)
-            .then(() => doc)
-    },
+    getChildren (doc) {
+        return Promise.all(doc.children.map(
+            url => this.db.get(url).run(this.cxn)
+        ));
+    }
 
-    getChildren : (doc) => {
+    dive (docs) {
+        if (!docs.length) return Promise.resolve([]);
+        return Promise.all(docs.map(this.getChildren))
+            .then(cs => cs.reduce((a,b) => a.concat(b), []))            
+            .then(children => this.dive(children))
+            .then(children => docs.concat(children));
+    }
 
-        return Promise.all(
-            doc.children.map(
-                url => rdb.table('documents').get(url).run(cxn)
-            )
-        )
-    },
-
-    dive : (docs) => {
-        if (docs.length) {
-            return Promise.all(docs.map(Doc.getChildren))
-                .then(cs => cs.reduce((a,b) => a.concat(b), []))            
-                .then(children => {
-                    console.log(JSON.stringify(children, null,2));
-                    return Doc.dive(children);
-                })
-                .then(children => docs.concat(children))
-        } else {
-            return Promise.resolve([]);
-        }
-    },
-
-    deleteDocs : (docs) => {
-        
-        return rdb.table('documents')
+    deleteDocs (docs) {
+        return this.db
             .getAll(...docs.map(d => d.url))
             .delete()
-            .run(cxn)
+            .run(this.cxn);
     }
         
 }
 
-const join = (...arrays) => arrays.reduce((x,y)=>x.concat(y), [])
+exports.nav = new Nav();
+exports.doc = new Doc();
 
-exports.doc = Doc;
+/*
+const get = lvl => (lvl == 0)
+    ? url => r.table('documents').get(url)
+    : url => r.table('documents').get(url)
+        .merge(d => ({
+            children: d('children').map(get(lvl-1)) 
+        }));
+
+>>> get(2)('/').run(cxn)
+
+*/

@@ -28,6 +28,7 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "rethinkdb": "^2.3.3",
-    "simplemde": "^1.11.2"
+    "simplemde": "^1.11.2",
+    "webpack": "^3.10.0"
   }
 }

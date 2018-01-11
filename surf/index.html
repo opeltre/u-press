@@ -6,22 +6,26 @@
 <body>
     <div id="body-ctr" class="flex-ctr-h">       
         <!-- La barre de nav -->
-        <nav id="nav" class="flex-ctr-v">
+        <nav class="flex-ctr-v">
             <img 
             id="home"
             src="/surf/media/images/Vinci_dodecahedron.png"
             alt="dodecahedron"
-            onclick="homeBtn(window.location.pathname)"
+            onclick="navclick()"
             />
-    <script>
-        function homeBtn (url) {
-            /read/.test(url)
-                ? url = url.replace('read','browse')
-                : url = url.replace('browse','read');
-            window.location = url;
-        }
-    </script>
+       
+        <script> 
+var navbar = false;
+navclick = () => {
+    !navbar 
+        ? d3.select('#route').call(Nav().lvl(2)).style('display','inline')
+        : d3.select('#route').style('display','none').selectAll('*').remove();
+    navbar = !navbar;
+};
+        </script>
+   
         </nav>
+
 
         <div id="page-ctr" class="flex-ctr-v">
 
@@ -36,7 +40,9 @@
             </header>
         
             <!-- Le livre ouvert -->
-            <div id="page">
+            <div class="flex-ctr-h grow">
+                <div id="route" style="display:none;width:200px;"></div>
+                <div id="page"></div>
             </div>
 
             <!-- D'autres boutons -->

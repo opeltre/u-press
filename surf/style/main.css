@@ -18,7 +18,11 @@ html,body {
     display: flex;
     flex-flow: row;
 }
-
+.grow {
+    flex-grow: 1;
+    max-height: 100%;
+    overflow: auto;
+}
 nav #home {
     display: inline;
     width:60px;
@@ -34,7 +38,7 @@ nav #home {
 
 #page-ctr {
     flex-grow: 1;
-    max-height: 100%
+    max-height: 100%;
 }
 
 header {
@@ -50,6 +54,10 @@ header {
     flex-grow: 1;
     padding: 10px;
     overflow: auto; 
+}
+
+#route {
+    border: 2px solid #eee7d6;
 }
 
 footer {
