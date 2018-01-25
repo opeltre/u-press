@@ -1,12 +1,12 @@
 # u-press.it
 
-*presse toi-meme*
+*presse toi-même*
 
-A framework to press it.
+a framework to press it.
 
 [visit](http://u-press.it:8080/) and press it.
 
-# Dirtree:
+# dirtree
 
 ```
 u-press/
