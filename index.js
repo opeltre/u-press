@@ -60,7 +60,7 @@ app.post('/doc*', (req,res) => {
 app.get('/route*', (req,res) => {
     res.setHeader("Content-Type","application/json");
     db.nav
-        .get(req.params[0])
+        .get(req.params[0], 2)
         .then(doc => res.end(JSON.stringify(doc)))
         .catch(onErr(res));
 });

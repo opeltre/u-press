@@ -1,5 +1,16 @@
 const rdb = require('rethinkdb');
 
+/*
+ * - APIs should allow for multiple arguments:
+ * 
+ * : get (...docs) {
+ * :    docs.forEach(d => {...get it...}
+ * : }
+ *
+ * - Two separate classes isn't so convenient...
+ *
+ */
+
 class Doc {
 
     constructor () {
@@ -57,8 +68,8 @@ class Nav {
     }
    
     // ---> User
-    get (url) {
-         return this.lvlGet(2)(url).run(this.cxn);
+    get (url, lvl) {
+         return this.lvlGet(lvl || 0)(url).run(this.cxn);
     }
 
     put (url, name) {
@@ -81,7 +92,54 @@ class Nav {
     }
     // ---> User
     
-    // <--- Doc 
+    // <--- Doc
+    runCheck (promise, val) {
+        return promise
+            .then(res => {
+                console.log(res);
+                if (res.errors == 0) 
+                    return Promise.resolve(val);
+                else 
+                    throw new Error(res.errors);
+            })
+            .then(() => val);
+    }
+
+    mv (doc, newParent) {
+        return this.db.get(doc).run(this.cxn)
+            .then(doc => this.dive([doc]))
+            .then(docs => Promise.resolve()
+                .then(() => this.move(docs, newParent))
+                .then(() => this.deleteDocs(docs))
+            );
+    }
+
+    move (docs, newParent) {
+        var oldParent = docs[0].parent;
+        return Promise.resolve(docs)
+            .then(docs => this.movedDocs(docs, oldParent, newParent)) 
+            .then(newDocs => {console.log(newDocs); return newDocs})
+            .then(newDocs => this.runCheck(
+                this.db.insert(newDocs).run(this.cxn),
+                {oldDoc: docs[0], newDoc: newDocs[0]}
+            ))
+            .then(d => Promise.resolve()
+                .then(() => this.unlinkChild(d.oldDoc, oldParent))
+                .then(() => this.linkChild(d.newDoc, newParent))
+            );
+    }
+    
+    movedDocs (docs, oldParent, newParent) {
+        return docs.map(doc => {
+            var d = Object.assign({}, doc);
+            d.url = d.url.replace(oldParent, newParent);
+            d.parent = d.parent.replace(oldParent, newParent);
+            d.children = d.children
+                .map(url => url.replace(oldParent, newParent));
+            return d;
+        });
+    }
+
     lvlGet (lvl) {
         return (lvl == 0)
 	    ? url => this.db.get(url)
@@ -100,16 +158,14 @@ class Nav {
             .then(doc => this.linkChild(doc));
     }
 
-    linkChild (doc) {
-        console.log(doc);
-        console.log(this);
-        return this.db.get(doc.parent)
+    linkChild (doc, prt) {
+        return this.db.get(prt || doc.parent)
             .update({children: rdb.row('children').append(doc.url)})
             .run(this.cxn).then(() => doc);
     }
 
-    unlinkChild (doc) {
-        return this.db.get(doc.parent)
+    unlinkChild (doc, prt) {
+        return this.db.get(prt || doc.parent)
             .update(p => ({children: p('children').filter(x => x.ne(doc.url))}))
             .run(this.cxn).then(() => doc);
     }
@@ -121,12 +177,14 @@ class Nav {
     }
 
     dive (docs) {
+        // dive: [doc] --> [doc, child, subchild, ... ]
         if (!docs.length) return Promise.resolve([]);
         return Promise
             .all(docs.map(d => this.getChildren(d)))
             .then(cs => cs.reduce((a,b) => a.concat(b), []))            
             .then(children => this.dive(children))
-            .then(children => docs.concat(children));
+            .then(children => docs.concat(children))
+            .catch(err => console.log(err));
     }
 
     deleteDocs (docs) {
