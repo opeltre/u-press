@@ -20,13 +20,29 @@ class Doc {
             .update({text:text})
             .run(this.cxn)
     }
+
+    put (url) {
+        return this.db
+            .insert({
+                url: url,
+                text: 'write it...',
+                fmt: 'jam'
+            })
+            .run(this.cxn);
+    }
+
+    del (urls) {
+        return this.db.getAll(...urls).delete()
+            .run(this.cxn);
+    }
 }
 
 class Nav { 
 
-    constructor () {
+    constructor (doc) {
         this.cxn = null;
         this.db = rdb.db('upress').table('nav');
+        this.doc = doc || new Doc();
         rdb.connect({host:'localhost', port:'28015'})
             .then(c => this.cxn = c);
     }        
@@ -48,15 +64,20 @@ class Nav {
     put (url, name) {
         var doc = this.init(url, name);
         console.log(doc);
-        return this.addChild(doc)
-            .then(doc => this.linkChild(doc));
+        return Promise.all([
+            this.addChild(doc),
+            this.doc.put(doc.url)
+        ]);
     }
 
     del (url) {
         return this.db.get(url).run(this.cxn)
             .then(doc => this.unlinkChild(doc))
             .then(doc => this.dive([doc]))
-            .then(docs => this.deleteDocs(docs));
+            .then(docs => Promise.all([
+                this.deleteDocs(docs),
+                this.doc.del(docs.map(d => d.url)),
+            ]));
     }
     // ---> User
     
@@ -73,10 +94,10 @@ class Nav {
         return this.db.insert(doc)
             .run(this.cxn)
             .then(res => {
-                console.log(res);
                 if (res.inserted == 1) return doc;
                 else throw new Error('! duplicate url !');
-            });
+            })
+            .then(doc => this.linkChild(doc));
     }
 
     linkChild (doc) {
@@ -101,7 +122,8 @@ class Nav {
 
     dive (docs) {
         if (!docs.length) return Promise.resolve([]);
-        return Promise.all(docs.map(this.getChildren))
+        return Promise
+            .all(docs.map(d => this.getChildren(d)))
             .then(cs => cs.reduce((a,b) => a.concat(b), []))            
             .then(children => this.dive(children))
             .then(children => docs.concat(children));
@@ -115,8 +137,8 @@ class Nav {
     }
         
 }
-
-exports.nav = new Nav();
+var doc = new Doc();
+exports.nav = new Nav(doc);
 exports.doc = new Doc();
 
 /*

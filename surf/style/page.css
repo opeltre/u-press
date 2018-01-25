@@ -1,9 +1,9 @@
-#page {
+.page {
     border: 2px solid #fff8e7;
 }
 
-#page * {
-    font-family: nouveau_ibm;
+.page * {
+    font-family: libertine;
 }
 
 #page textarea {
@@ -16,8 +16,31 @@
     font-family: bowman;
 }
 
-#page pre {
-    font-family: bowman;
-    background-color: #fff8e7;
+.page pre, .page code {
+    font-family: anonymous-pro;
+    background-color: #faf8f5;
+    padding: 3px;
 }
 
+#view {
+    opacity: 0.9;
+    background-color: #faf8f5;
+}
+#middle-ctr button {
+    margin-left: 2px;
+}
+
+.page .def {
+    padding: 10px;
+    border: 2px solid #fff8e7;
+}
+
+.page .prop {
+    padding: 10px;
+    border: 2px solid #eee7d6;
+}
+
+.page .thm {
+    padding: 10px;
+    border: 2px solid #ddd6c5;
+}

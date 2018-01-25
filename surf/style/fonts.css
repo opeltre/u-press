@@ -26,3 +26,11 @@
     font-family:"nimbus";
     src: url('/surf/media/fonts/nimbus/nimbusmono-regular.otf');
 }
+@font-face {
+    font-family:"old-standard";
+    src: url('/surf/media/fonts/old-standard/oldstandard-2.0.2.ttf/OldStandard-Regular.ttf');
+}
+@font-face {
+    font-family:"anonymous-pro";
+    src: url('/surf/media/fonts/anonymous-pro/Anonymous_Pro.ttf');
+}

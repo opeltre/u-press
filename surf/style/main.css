@@ -21,8 +21,38 @@ html,body {
 .grow {
     flex-grow: 1;
     max-height: 100%;
+}
+#middle-ctr {
+    flex-grow: 1;
+    max-height: 100%;
+}
+
+#page-ctr {
+    flex-grow: 1;
+    overflow: hidden;
+    max-height: 100%;
+}
+
+header {
+    flex-grow: 0;
+    padding-left: 0px;
+    margin-left: 0px;
+    margin-top:10px;
+    margin-bottom: 10px;
+    justify-content: flex-end;
+}
+.page {
+    flex-grow: 1;
+    padding: 10px;
     overflow: auto;
 }
+
+footer {
+    padding: 5px;
+    justify-content: space-between;
+    height: 25px;
+}
+
 nav #home {
     display: inline;
     width:60px;
@@ -36,31 +66,3 @@ nav #home {
     width: 120px;
 }
 
-#page-ctr {
-    flex-grow: 1;
-    max-height: 100%;
-}
-
-header {
-    flex-grow: 0;
-    padding-left: 0px;
-    margin-left: 0px;
-    margin-top:10px;
-    margin-bottom: 10px;
-    justify-content: flex-end;
-}
-
-#page {
-    flex-grow: 1;
-    padding: 10px;
-    overflow: auto; 
-}
-
-#route {
-    border: 2px solid #eee7d6;
-}
-
-footer {
-    padding: 5px;
-    justify-content: space-between;
-}

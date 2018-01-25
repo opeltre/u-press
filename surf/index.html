@@ -11,42 +11,41 @@
             id="home"
             src="/surf/media/images/Vinci_dodecahedron.png"
             alt="dodecahedron"
-            onclick="navclick()"
+            onclick="u.switch()"
             />
-       
-        <script> 
-var navbar = false;
-navclick = () => {
-    !navbar 
-        ? d3.select('#route').call(Nav().lvl(2)).style('display','inline')
-        : d3.select('#route').style('display','none').selectAll('*').remove();
-    navbar = !navbar;
-};
-        </script>
-   
         </nav>
 
 
-        <div id="page-ctr" class="flex-ctr-v">
+        <div id="middle-ctr" class="flex-ctr-v">
 
             <!-- Des boutons -->
             <header class="flex-ctr-h">
                 <h1>u-press.it</h1>
                 <span style="flex-grow:1"></span>
+                <!--
                 <a href="http://geogoo.net">Accueil</a>
                 <a href="http://you-talking-to-me.com">Aide</a>
                 <a href="http://ctrlaltdel.org">Couloir</a>
                 <a href="https://apod.nasa.gov/apod/random_apod.html">Sortie</a>
+                -->
             </header>
         
             <!-- Le livre ouvert -->
-            <div class="flex-ctr-h grow">
-                <div id="route" style="display:none;width:200px;"></div>
-                <div id="page"></div>
+            <div id ="page-ctr" class="flex-ctr-h grow">
+                <div id="nav" style="display:none;width:200px;"></div>
+                <div id="page" class="page"></div>
+                <div id="view" class="page" style="display:none;" ></div>
             </div>
 
             <!-- D'autres boutons -->
             <footer class="flex-ctr-h">
+                <span id="page-ctl"></span>
+                <span class="grow"></span>
+                <span id="search">
+                    <input> O-  
+                </span>
+                
+                <!--
                 <span id="desk" class="read">
                     <button id="mode-btn" onclick="page.modeSwitch()">edit</button>
                     <button id="post-btn" onclick="page.post()">post</button>
@@ -58,9 +57,7 @@ navclick = () => {
                     <button onclick="nav.add()"> + </button>
                 </span>
                 <span style="flex-grow:1"></span>
-                <span id="search">
-                    <input> O-  
-                </span>
+                -->
             </footer>
         </div>
 

@@ -6,35 +6,42 @@ const lex = require('./lexers');
 const fs = require('fs');
 
 function parse (text) {
-    // * BLOCK GRAMMAR *
-    text = text.split("\n")
-    text.push("");
-    lex.A.read(text,true);
 
+    // * instantiate lexers *
+    var lexA = lex.A()
+    var lexB = lex.B()
+    var lexC = lex.C()
+
+    // * BLOCK GRAMMAR *
+    text = text.split("\n");
+    text.push("");
+    lexA.read(text,'EOF');
+    
     // * PARAGRAPH RECOGNITION *
-    var viewA = lex.A
+    // >> do something for the blank lines...
+    var viewA = lexA
         .view(
             false,
             s => s.lexeme.esc ? "<e>" : (s.lexeme.branch ? "<b>" : "<l>"),
-            s => s.lexeme.esc ? "</e>" : (s.lexeme.branch ? "</b>" : "</l>"),
+            s => s.lexeme.esc ? "</e>" : (s.lexeme.branch ? "</b>" : "</l>")
         );  
-
+    
     var inB = viewA
         .render();
-    lex.B.read(inB);
+    lexB.read(inB);
 
-    var viewB = lex.B.view();     
+    var viewB = lexB.view();     
 
     // * MERGE && GET LEAVES  *  
     var inC = viewA
         .embed(viewB)
         .render();
 
-    var leaves = lex.C          // some class & methods could be defined here...
+    var leaves = lexC          // some class & methods could be defined here...
         .read(inC)
         .S
         .map( s => {            // ...remembering breaks
-            var lines = lex.A.content
+            var lines = lexA.content
                 .slice(s.i[0], s.i[1])
                 .map( line => line.split(/\s/) );
             return {
@@ -44,7 +51,6 @@ function parse (text) {
                 breaks: lines.map( l => l.length )
             };
         })
-
         // * INLINE GRAMMAR  *
         .map( leaf => {         // lexing
             if (!leaf.esc) {
@@ -55,7 +61,6 @@ function parse (text) {
             } 
             return leaf;
         })
-
     leaves
         .forEach( leaf => {     // join, respecting breaks
             var t = leaf.text;
@@ -66,7 +71,7 @@ function parse (text) {
             });
         });
 
-    var tokens = lex.A
+    var tokens = lexA
         .view()
         .embed(viewB)
         .render(); 
@@ -85,6 +90,36 @@ exports.parse = parse;
 },{"./jam":2,"./lexers":3,"fs":4}],2:[function(require,module,exports){
 // ./jam.js
 
+/* V2:
+ * Redefine Lexemes as factory functions:
+ *  
+ *  : var b = Lexeme('blank_line')
+ *  :     .open(/^\s$/)   // configure...
+ *  :     .close(/\S/)
+ *  :     ();             // init lexeme!
+ *
+ * then Lexers can truly be reinstantiated on demand:
+ * this is really necessary for stability.
+ *
+ * Separate each class in its own file.
+ * 
+ * jam/
+ *  :--index.js
+ *  :--core/
+ *  :   :--lexeme.js
+ *  :   :--lexer.js
+ *  :   `--view.js
+ *  `--lexers/
+ *      :--paragraph.js
+ *      :--leaves.js
+ *      :--inline/
+ *      :   :--md.js
+ *      :   `--jam.js
+ *      `--block/
+ *          :--md.js
+ *          `--jam.js
+ */
+
 //$ f && g
 const ifdo = (f,g) => ( (...x) => {y=f(...x); if (y) g(y); return y;} );
 const iffeed = (f,g) => ( (...x) => {y=f(...x); if (y) return g(y);} );
@@ -93,7 +128,6 @@ function splitMatch (m) {
     // RegExp.exec(String) --->  m  ---> [ match, stripped_input, $1, $2, ... ]
     if (m) return [m[0], m.input.replace(m[0],'')].concat(m.slice(1));
 }
-
 
 class Lexeme {
 /*  : ## Jam   --->  ['## ','Jam']  --->  ['<h2>', 'Jam']
@@ -107,7 +141,7 @@ class Lexeme {
         this.esc = /esc/.test(opt) ? true : false;
         this.lvl = /lvl/.test(opt) ? 0 : -1;
         this.stop = /stop/.test(opt) ? true : false;
-        this.branch = /\sb\s/.test(opt) ? true : false;
+        this.branch = /\bb\b/.test(opt) ? true : false;
 
         // recognition:
         this.oTest = s => splitMatch(open.exec(s));
@@ -119,7 +153,7 @@ class Lexeme {
         this.oRdr = ([a,b]) => [`<${this.name}>`, /!o/.test(opt) ? (a+b) : b]; 
         this.cRdr = ([a,b]) => [`</${this.name}>`, /!c/.test(opt) ? (a+b) : b];
         // strippers only:
-        this.strip = s => s.replace(open,'');
+        this.stripper = s => (this.oTest(s) || ['', s]);
     }
     
     // <--- Lexer
@@ -150,6 +184,10 @@ class Lexeme {
         // dothen: Match (a, b, ...c) --->  [a',b'] = ["token", "content"]  
         if (o_c == 'open') this.oRdr = a => rdr(...a);
         if (o_c == 'close') this.cRdr = a => rdr(...a);
+        return this;
+    }
+    strip (reg) {
+        this.stripper = s => (splitMatch(reg(this).exec(s)) || ['', s]);
         return this;
     }// ---> User
 }
@@ -196,7 +234,7 @@ class Lexer {
             len = this.u_strip.length;
         if ( len ) {
             this.u_strip.slice(0,len-1).forEach(u => {
-                var strip = u.oTest(v_j);
+                var strip = u.stripper(v_j);
                 v_js.push(strip[0]);
                 v_j = strip[1];
             });
@@ -218,7 +256,7 @@ class Lexer {
                 }
             } 
             else if (u.lexeme.lvl >= 0) {
-                v_j = u.lexeme.strip(v_j)
+                v_j = u.lexeme.stripper(v_j)[1]
             }
         } while (c && !u.lexeme.stop);
         return v_j;
@@ -258,19 +296,20 @@ class Lexer {
 
     flush () {
         this.content = [];
-        this.u = [{lexeme:Lexeme.SOF(), i:-1, iS:-1}];
+        this.u = [{lexeme:Lexeme.SOF(), i:0, iS:0, token:''}];
         this.u_strip = [];
         this.S = [];
         return this;
     }
 
-    EOF (input) { 
-        this.S.push({
-            lexeme: Lexeme.SOF(), 
-            i:[0,input.length -1 ], 
-            iS:[0,this.S.length -1 ], 
-            token:['','']
-        });
+    EOF (input) {
+        this.u.reverse()
+            .forEach( u => this.S.push({
+                lexeme: u.lexeme, 
+                i:      [u.i, input.length -1 ], 
+                iS:     [u.iS, this.S.length -1 ], 
+                token:  [u.token, u.token.replace('<','</')]
+        }));
     }
 
 }
@@ -322,73 +361,164 @@ const jam = require('./jam');
 /* * * * * * * * *        
  * BLOCK GRAMMAR *         
  * * * * * * * * */
-var q = jam.tok('quote',/^> /,/^(?!> )/,"lvl b !c");
+/*
+ * Each lexer should be in a separate file, 
+ * inside a function body -> v2.
+ *
+ * Even better, markdown, tex, and custom functionality
+ * should be made as independent as possible,
+ * so as to provide a bare markdown parser to tweak at will.
+ */
 
-var b = jam.tok('_',/^\s*$/, /^./, "!c");
+function lexBlock (lang) {
+    
+    var lang = lang || 'fr';
 
-var h = jam.tok('h',/#+ /,/^(?! {2})/,"!c")
-    .on('open', (a,b) => {h.val = a.length - 1;})
-    .render('open', (a,b) => [`<h${h.val}>`, b])
-    .render('close', (a,b) => [`</h${h.val}>`, a+b]);
+    var q = jam.tok('blockquote', /^> /, /^(?!> )/, "lvl b !c");
 
-var c = jam.tok('code',/`{3,}/, /./, "esc stop", [/./])
-    .on('open', a => { 
-        c.val.push(new RegExp(a)); 
-        c.test('close', self => c.val[self.val.length - 1]);
-    })
-    .on('close', () => c.val.pop() )
-    .render('open',() => ["<pre><code>", ''])
-    .render('close',() => ["</pre></code>",'']);
+    var b = jam.tok('_', /^\s*$/, /^./, "!c");
 
-var d = jam.tok('def', /^~{3,}(\w*)/, /^~{3,}/, "stop")
-    .render('open',(a,b,c) => [`<div class="def" name="def-${c}">`, b])
-    .render('close', () => ["</div>",""]);
+    var ul = jam.tok('ul', /^\* /, /^(?!\* )/, "!o !c b ");
+    ul
+        .on('open', () => {
+            ul.test('open', () => /^(?!.*)/);
+        })
+        .on('close', () => {
+            ul.test('open', () => /^\* /);
+        });
 
-var eq = jam.tok('eq', /^'{3}\s*/, /^'{3}/, "stop")
-    .render('open', () => ['<script type="math/tex; mode=display">',''])
-    .render('close', () => ['</script>',''])
+    var li = jam.tok('li', /^\* /, /^\* /, "lvl b !c");
+    li
+        .strip(() => /^(?:\s{4})/)
+        .on('open', () => {
+            ul.test('close', () => /^(?!.*)/);
+            b.on('open', () => {
+                li.test('close', () => /^(?!\s{4})/)
+                    .render('close', (a,b) => ['</li>', a + b]);
+            });
+        })
+        .on('close', () => {
+            ul.test('close', () => /^(?!\* )/);
+            b.on('open', () => {});
+            li.test('close', () => /^\* /)
+                .render('close', (a,b) => ['</li>', a + b]);
+        });
 
-var lex = jam.lex([q,h,c,b,eq]);
+
+    var h = jam.tok('h',/#+ /,/^(?! {2})/,"!c")
+        .on('open', (a,b) => {h.val = a.length - 1;})
+        .render('open', (a,b) => [`<h${h.val}>`, b])
+        .render('close', (a,b) => [`</h${h.val}>`, a+b]);
+
+    var c = jam.tok('code',/`{3,}/, /./, "esc stop", [/./])
+        .on('open', a => { 
+            c.val.push(new RegExp(a)); 
+            c.test('close', self => c.val[self.val.length - 1]);
+        })
+        .on('close', () => c.val.pop() )
+        .render('open',() => ["<pre><code>", ''])
+        .render('close',() => ["</pre></code>",'']);
+
+    var eq = jam.tok('eq', /^'{3}\s*/, /^'{3}/, "stop")
+        .render('open', () => ['<script type="math/tex; mode=display">',''])
+        .render('close', () => ['</script>','']);
+
+    const idfy = c => c
+        .replace(/\s$/,'')
+        .replace(/\s/,'-')
+        .toLowerCase();
+
+    var def = jam.tok('def', /^,{3,}(\w*)\s*$/, /^,{3,}\s*/, "stop b")
+        .render('open',(a,b,c) => [
+            `<div class="def" id="def-${idfy(c)}">`, 
+            "**Definition:**" + b
+        ])
+        .render('close', () => ["</div>",""]);
+
+    var prop = jam.tok('prop', /^;{3,}(\w*)\s*$/, /^;{3,}\s*/, "stop b")
+        .render('open',(a,b,c) => [
+            `<div class="prop" id="prop-${idfy(c)}">`, 
+            "**Proposition:**" + b
+        ])
+        .render('close', () => ["</div>",""]);
+
+    var thm = jam.tok('thm', /^:{3,}(\w*)\s*$/, /^:{3,}\s*/, "stop b")
+        .render('open',(a,b,c) => [
+            `<div class="thm" id="thm-${idfy(c)}">`, 
+            "**Theorem:** " + b
+        ])
+        .render('close', () => ["</div>",""]);
+
+    return jam.lex([q, h, c, b, eq, ul, li, def, prop, thm]);
+}
 
 /* * * * * * * * * * * * *
  * PARAGRAPH RECOGNITION *
  * * * * * * * * * * * * */
-var p = jam.tok('p', /(?:<\/[le]>$)|(?:<b>$)|(?:^<\/b>)/, /./,"stop !o !c")
-    .on('open',a => { 
-        // prevent p wrapping of branches w/o blocks nor blank lines
-        p.val = (a=="<b>") ? "<b>" : "coucou";
-        p.test('close', p => { 
-            var re = "(?:^<[le]>)|(?:<b>$)";
-            if (p.val != "<b>") re += "|(?:^<\/b>)";
-            return new RegExp(re);
+/* see to blank lines, so as not wrap last <li>
+ *
+ * really assumes input is as viewA in index.js!
+ * ideally link these two lexers in a more abstract way,
+ * or at least group these two definitions...
+ *
+ *  : lex.A.view( s => {...}, ...)
+ *  : lex.B.lexemes = [jam.tok(...)]
+ */
+function lexParagraph () {
+ 
+    var p = jam.tok('p', /(?:<\/[leb]>$)|(?:<b>$)/, /./,"stop !o !c")
+        .on('open',a => { 
+            // prevent p wrapping of branches w/o blocks nor blank lines
+            p.val = (a=="<b>") ? "<b>" : "coucou";
+            p.test('close', p => new RegExp(
+                p.val == "<b>" 
+                    ? "(?:^<[leb]>)"
+                    : "(?:^<[leb]>)|(?:^<\/[leb]>)" 
+            ));
         });
-    });
 
-var lexP = jam.lex([p]);
+    return jam.lex([p]);
+}
 
 /* * * * * * * * * * * * * * * *
- * MERGE TOKENS && FEED BLOCKS *      ---> Parser(Lexer1,Lexer2,...) method?
+ * MERGE TOKENS && FEED BLOCKS *  
  * * * * * * * * * * * * * * * */
-var inline = jam.tok('inline',/<[lpb]>$/, /^<\/[lpb]>/,'stop');
-var escaped = jam.tok('esc',/<e>$/, /^<\/e>/,'esc stop');
-var lexL = jam.lex([inline,escaped]);
+function lexLeaf () {
+    var inline = jam.tok('inline',/<\/?[lpb]>$/, /^<\/?[lpb]>/,'stop');
+    var escaped = jam.tok('esc',/<e>$/, /^<\/e>/,'esc stop');
+    return jam.lex([inline,escaped]);
+}
 
 /* * * * * * * * * *
  * INLINE GRAMMAR  *
  * * * * * * * * * */
-var em = jam.tok('em',/^\*(?!\*)/, /\*(?!\*)$/, 'o_c' );
-var strong = jam.tok('strong',/^\*\*(?!\*)/,/\*\*(?!\*)$/, 'o_c');
 
-var ieq = jam.tok('ieq',/^''/,/''$/, 'o_c esc')
-    .render('open', (a,b) => ['<script type="math/tex">',b])
-    .render('close', (a,b) => ['</script>',b])
+function lexInline () {
+    const punctuation = "([,;:\.\!\?]*)$";
+    const endP = re => new RegExp(re.source.replace('$',punctuation));
 
-const lexI = () => jam.lex([em,strong,ieq], "o_c");
+    var em = jam.tok('em', /^\*(?!\*)/, endP(/\*(?!\*)$/), 'o_c' );
+    var strong = jam.tok('strong', /^\*\*(?!\*)/, endP(/\*\*(?!\*)$/), 'o_c');
+    var code = jam.tok('code', /^`/, endP(/`$/), 'o_c');
 
-exports.A = lex;
-exports.B = lexP;
-exports.C = lexL;
-exports.inline = lexI;
+    var ieq = jam.tok('ieq', /^''/, endP(/''$/), 'o_c esc')
+        .render('open', (a, b) => ['<script type="math/tex">', b])
+        .render('close', (a, b, c) => ['</script>' + c, b])
+
+
+    var inlines = [em, strong, code]
+        .map( lexeme => lexeme
+            .render('close', (a, b, c) => [`</${lexeme.name}>${c}`, b])
+        )
+        .concat([ieq])
+
+    return jam.lex(inlines, "o_c");
+}
+
+exports.A = lexBlock;
+exports.B = lexParagraph;
+exports.C = lexLeaf;
+exports.inline = lexInline;
 
 },{"./jam":2}],4:[function(require,module,exports){
 

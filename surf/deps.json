@@ -6,7 +6,7 @@
     
     {   
         "name": "mathjax",
-        "src": "dist/mathjax/MathJax.js?config=TeX-AMS-MML_SVG"
+        "src": "dist/mathjax/MathJax.js?config=TeX-AMS-MML_SVG,local/local"
     },
 
     {

@@ -2,10 +2,9 @@
 //      : ajax().get(url).then((res) => ... )
 //      : ajax().post(url,data).then((res) => ... );
 
-const ajax = () => {
+function ajax () {
     return new Ajax();
 }
-
 module.exports = ajax;
 
 class Ajax {

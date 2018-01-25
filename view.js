@@ -7,6 +7,14 @@
 const PREFIX = "/srv/http/scriptorium/surf/";
 const SURF = "/surf/";
 
+const lib = [
+    "getset",
+    "ctl",
+    "nav",
+    "page",
+    "main"
+].map(src => 'lib/'+src+'.js')
+
 function ModView(name) {
     var Views = { 
         read : View_read,
@@ -36,7 +44,7 @@ class View {
         this.dom = new JSDOM(html[name || 'index']);
         this.doc = this.dom.window.document;
         style.forEach( s => this.style(s));
-        deps.forEach( dep => this.script(dep.src));
+        this.script(deps.map(d=>d.src));
         return this;
     }
 
@@ -55,11 +63,13 @@ class View {
         this.doc.head.appendChild(sheet);
     }
 
-    script (s, selector) {
-        var node = this.doc.querySelector(selector || 'head')
-        var script = this.doc.createElement('script');
-        script.src = SURF + s;
-        node.appendChild(script);
+    script (srcs, selector) {
+        srcs.forEach( s => {
+            var node = this.doc.querySelector(selector || 'head');
+            var script = this.doc.createElement('script');
+            script.src = SURF + s;
+            node.appendChild(script);
+        });
     }
 
     d3 (selector) {
@@ -72,8 +82,7 @@ class View_read extends View {
 
     constructor () {
         super();
-        this.script("lib/nav.js");
-        this.script("lib/desk.js");
+        this.script(lib);
     }
     
     bind (text) {

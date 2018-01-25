@@ -11,45 +11,57 @@ function Nav () {
     var self = {
         show: false,
         route: '/',
+        focus: '/',
         lvl: 2,
+        bind: () => alert('click')
 //        ctlr: surf
     };
 
     function my (selection) {
-        my.selection = selection.call(flush);
-        ajax().get('/route'+ self.route)
+        my.selection = (selection || my.selection);
+        // nav-item click:
+        return ajax()
+            .get('/route'+ self.route)
             .then(d => my.draw(JSON.parse(d)));
     }
 
     my.draw = (tree) => {
+        my.selection.call(flush);
         // nav items: documents dirtree
+        my.item = NavItem(self.lvl)
+            .lvl(self.lvl)
+            .bind(self.bind)
+            .focus(self.focus);
+        // nav controls: put, delete & co
+        my.ctl = Ctl().buttons([
+            [' + ', my.put],
+            [' - ', my.del]
+        ]);
         my.selection.selectAll(`.nav${self.lvl}`)
             .data([tree])
             .enter().append('div')
                 .attr('class',`.nav${self.lvl}`)
-                .call(NavItem(self.lvl).lvl(self.lvl));
-        // nav controls: put, delete & co
-        var btns = {
-            ' + ': my.put,
-            ' - ': my.del
-        };
+                .call(my.item);
         my.selection
             .append('div').property('id', 'nav-ctl')
-            .call(Ctl().buttons(btns));
+            .call(my.ctl);
+        return my;
     };
 
     my.put = () => {
         var data = {name: prompt('name it','')};
         return ajax()
-            .put('/route'+self.route, JSON.stringify(data))
+            .put('/route'+self.focus, JSON.stringify(data))
             .then(res => alert(res))
+            .then(my);
     };
 
     my.del = () => {
-        if (self.route == '/') return alert("don't do it!");
+        if (self.focus == '/') return alert("don't do it!");
         return ajax()
-            .del('/route'+self.route)
-            .then(res => alert('/route'+self.route+'\n'+JSON.stringify(res)));
+            .del('/route'+self.focus)
+            .then(res => alert(res))
+            .then(my);
     };
     
     return getset(my, self);
@@ -64,27 +76,43 @@ function NavItem (depth) {
     var self = {
         lvl: 0,
         expanded: depth ? true : false,
+        bind: () => alert('uclick'),
+        focus: '/',
         style: {
             'font-family': 'bowman',
             'font-size': my => (14 + 4 * my.lvl()),
             'margin': 5,
             'margin-left': 30,
             'color': 'black'
+        },
+        stylefocus: {
+            'border': '2px solid #ddd5c4'
         }
     };
     
     function my (selection) {
         my.selection = selection
             .call(style, my)
+            .classed('nav-focus', d => d.url == self.focus)
         my.selection.append('span')
             .html('+ ')
-            .on('click', (d) => self.expanded ? my.retract() : my.expand())
+            .on('click', d => self.expanded ? my.retract() : my.expand())
         my.selection.append('span')
             .html(d => d.name)
-            .on('click', d => alert(d.url));
+            .attr('class','nav-item')
+            .on('click', my.bind());
         // expand it
         if (depth && self.lvl > 0) 
             my.expand(depth - 1);
+        return my;
+    }
+
+    my.item = (depth) => {
+        return NavItem(depth || 0)
+            .lvl(self.lvl-1)
+            .bind(self.bind)
+            .style(self.style)
+            .focus(self.focus);
     }
 
     my.expand = (depth) => {
@@ -95,75 +123,18 @@ function NavItem (depth) {
             .enter().append('div')
                 .attr('class',`nav${self.lvl-1}`)
                 .each(function () {
-                    d3.select(this).call(NavItem(depth || 0).lvl(self.lvl-1));
+                    d3.select(this).call(my.item(depth));
                 });
-        self.expanded = true;
-        return my;
+        return my.expanded(true);
     };
 
     my.retract = () => {
         my.selection
             .selectAll(`.nav${self.lvl-1}`)
             .remove();
-        self.expanded = false;
-        return my;
+        return my.expanded(false);
     };
 
     return getset(my, self);
 
 }
-
-function Ctl () {
-    
-    self = { 
-        buttons: {'btn': () => alert('uclick')} 
-    } 
-
-    function my (selection) {
-        self.buttons = Object.keys(self.buttons)
-            .map(k => ({html: k, onclick: self.buttons[k]}))
-        selection
-            .selectAll('button')
-            .data(self.buttons)
-            .enter().append('button')
-                .html(d => d.html)
-                .on('click', d => d.onclick())
-    }
-    
-    return getset(my, self);
-
-}
-
-/********************************/
-/****** helper functions ********/
-
-function getset (obj, attrs) {
-    
-    Object.keys(attrs).forEach(
-        key => obj[key] = function (val) {
-            if (!arguments.length) return attrs[key];
-            attrs[key] = val;
-            return obj;
-        }
-    );
-    return obj;
-}
-
-function style (selection, my) {
-    
-    var sheet = my.style();
-
-    Object.keys(sheet).forEach(
-        key => selection.style(
-            key, 
-            typeof sheet[key] == "function"
-                ? sheet[key](my)
-                : sheet[key]
-        )
-    );
-}
-
-function flush (selection) {
-    selection.selectAll('*').remove;
-}
-

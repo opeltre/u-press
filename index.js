@@ -17,9 +17,16 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 STATIC.forEach((dir) => app.use('/'+dir, express.static(dir)))
 
+// promise.catch(onErr(res))
+const onErr = (res) => (err) => {
+    console.log(err);
+    res.setHeader('Content-Type','application/json')
+    res.end(JSON.stringify({error: `${err}`}));
+}
+
 ////////////// @ root
 
-app.get('/', (req, res) => res.redirect('read') )
+app.get('/', (req, res) => res.redirect('/read/') )
 
 ////////////// @ ip
 
@@ -28,41 +35,41 @@ app.get('/ip', (req, res) => res.end(req.connection.remoteAddress));
 ////////////// @ read
 
 app.get('/read*', (req,res) => {
-    db.doc
-        .get(req.params[0])
-        .then(doc => res.end(view('read').render(doc.text)));
+    res.end(view('read').render(''));
 });
 
-app.get('/raw*', (req,res) => {
+///////////// @ doc: ajax <---> db 
+app.get('/doc*', (req,res) => {
     res.setHeader("Content-Type","text/plain");
-    console.log(req.params[0]);
     db.doc
         .get(req.params[0])
-        .then(text => res.end(text));
+        .then(text => res.end(text))
+        .catch(onErr(res));
 });
 
-app.post('/read*', (req,res) => {
+app.post('/doc*', (req,res) => {
     [text] = req.body;
     db.doc
-        .post(req.params[0],text)
-        .then(() => res.end('write'));
+        .post(req.params[0], text)
+        .then(() => res.end('write'))
+        .catch(onErr(res));
 });
 
-////////////// @ routen --> db.js
+////////////// @ route: ajax <---> db
 
 app.get('/route*', (req,res) => {
     res.setHeader("Content-Type","application/json");
     db.nav
         .get(req.params[0])
         .then(doc => res.end(JSON.stringify(doc)))
-        .catch(err => res.end(JSON.stringify({error: `${err}`})));
+        .catch(onErr(res));
 });
 
 app.put('/route*', (req,res) => {
     db.nav
         .put(req.params[0], req.body.name)
         .then(() => res.end('put'))
-        .catch(err => res.end(JSON.stringify({error: `${err}`})));
+        .catch(onErr(res));
 });
 
 app.delete('/route*', (req,res) => {
@@ -72,7 +79,7 @@ app.delete('/route*', (req,res) => {
             res.setHeader("Content-Type","text/plain");
             res.end(JSON.stringify(children, null,2));
         })
-        .catch(e => console.log(e));
+        .catch(onErr(res));
 })
 
 ////////////// @ login
