@@ -1,7 +1,4 @@
 // ./surf/lib/page.js
-//
-// depends on nav.js for now
-// (where getset lies...)
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 

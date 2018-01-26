@@ -13,13 +13,13 @@ function Nav () {
         route: '/',
         focus: '/',
         lvl: 2,
+        moving: null,
         bind: () => alert('click')
-//        ctlr: surf
     };
 
     function my (selection) {
         my.selection = (selection || my.selection);
-        // nav-item click:
+        console.log(my.moving());
         return ajax()
             .get('/route'+ self.route)
             .then(d => my.draw(JSON.parse(d)));
@@ -27,27 +27,20 @@ function Nav () {
 
     my.draw = (tree) => {
         my.selection.call(flush);
-        // nav items: documents dirtree
-        my.item = NavItem(self.lvl)
-            .lvl(self.lvl)
-            .bind(self.bind)
-            .focus(self.focus);
-        // nav controls: put, delete & co
-        my.ctl = Ctl().buttons([
-            [' + ', my.put],
-            [' - ', my.del]
-        ]);
+        // nav-items: dirtree
         my.selection.selectAll(`.nav${self.lvl}`)
             .data([tree])
             .enter().append('div')
                 .attr('class',`.nav${self.lvl}`)
                 .call(my.item);
+        // ctl: put del mv
         my.selection
             .append('div').property('id', 'nav-ctl')
             .call(my.ctl);
+        // nav-slots between items
         return my;
     };
-
+    
     my.put = () => {
         var data = {name: prompt('name it','')};
         return ajax()
@@ -63,9 +56,30 @@ function Nav () {
             .then(res => alert(res))
             .then(my);
     };
+
+    my.mv = () => {
+        if (self.focus == '/') return alert("don't do it!");
+        my.moving(self.focus);
+    }
+    
+    my.item = (selection) => {
+        return NavItem(self.lvl)
+            .lvl(self.lvl)
+            .bind(self.bind)
+            .focus(self.focus)
+            (selection);
+    }
+
+    my.ctl = Ctl()
+        .buttons([
+            [' + ', my.put],
+            [' - ', my.del],
+            [' &gt; ', my.mv]
+        ]);
     
     return getset(my, self);
 }
+
 
 function NavItem (depth) {
 
@@ -94,9 +108,11 @@ function NavItem (depth) {
         my.selection = selection
             .call(style, my)
             .classed('nav-focus', d => d.url == self.focus)
+        // expand click
         my.selection.append('span')
             .html('+ ')
             .on('click', d => self.expanded ? my.retract() : my.expand())
+        // bind click: from above
         my.selection.append('span')
             .html(d => d.name)
             .attr('class','nav-item')
@@ -136,5 +152,4 @@ function NavItem (depth) {
     };
 
     return getset(my, self);
-
 }

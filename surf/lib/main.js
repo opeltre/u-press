@@ -43,8 +43,8 @@ function Main () {
     
     my.switch = () => {
         hideNseek({
-            inline: ['#nav','#page-ctl'],
-            block: ['#page','#view']
+            inline: ['#nav', '#page-ctl'],
+            block: ['#page', '#view']
         })();
         nav = !nav;
     }
