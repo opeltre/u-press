@@ -8,8 +8,18 @@ const rdb = require('rethinkdb');
  * : }
  *
  * - Two separate classes isn't so convenient...
+ *   If Doc is to remain a separate class, it may not
+ *   be indexed by url.
+ *
+ * - Just document server- & surfer-side API and clean
+ *   according to needs
  *
  */
+
+function logthen (x) {
+    console.log(x);
+    return x;
+}
 
 class Doc {
 
@@ -49,6 +59,8 @@ class Doc {
 }
 
 class Nav { 
+
+    // has control on Doc
 
     constructor (doc) {
         this.cxn = null;
@@ -90,9 +102,18 @@ class Nav {
                 this.doc.del(docs.map(d => d.url)),
             ]));
     }
+    
+    mv (url, newParent, n) {
+        return this.db.get(url).run(this.cxn)
+            .then(doc => this.dive([doc]))
+            .then(docs => this.move(docs, newParent))
+            .then(newDoc => this.indexOf(newDoc))
+            .then(k => this.order(newParent, k, n)); 
+    }
+
     // ---> User
     
-    // <--- Doc
+    // <--- Dirty internals
     runCheck (promise, val) {
         return promise
             .then(res => {
@@ -105,17 +126,39 @@ class Nav {
             .then(() => val);
     }
 
-    mv (doc, newParent) {
-        return this.db.get(doc).run(this.cxn)
-            .then(doc => this.dive([doc]))
-            .then(docs => Promise.resolve()
-                .then(() => this.move(docs, newParent))
-                .then(() => this.deleteDocs(docs))
-            );
+    indexOf (doc) {
+        return this.db.get(doc.parent)('children')
+            .run(this.cxn)
+            .then(children => children.indexOf(doc.url));
+    }
+
+    order (url, k, n) {
+        console.log('hey')
+        return this.db.get(url).run(this.cxn)
+            .then(p => this.reordered(p.children, k, n))
+            .then(logthen)
+            .then(reordered => this.db.get(url)
+                .update({children: reordered})
+                .run(this.cxn)
+            )
+            .then(res => console.log(res));
+    }
+
+    reordered (a, k, n) {
+        // place k-th element of a at index n.
+        var n = n < a.length ? n : a.length - 1,
+            m = Math.min(k,n),
+            M = Math.max(k,n);
+        return a.slice(0,m)
+            .concat([a[M]])
+            .concat(a.slice(m+1,M))
+            .concat( m != M ? [a[m]] : [])
+            .concat(a.slice(M+1,));
     }
 
     move (docs, newParent) {
         var oldParent = docs[0].parent;
+        if (oldParent == newParent) return docs[0];
         return Promise.resolve(docs)
             .then(docs => this.movedDocs(docs, oldParent, newParent)) 
             .then(newDocs => {console.log(newDocs); return newDocs})
@@ -123,9 +166,12 @@ class Nav {
                 this.db.insert(newDocs).run(this.cxn),
                 {oldDoc: docs[0], newDoc: newDocs[0]}
             ))
+        /** could just be  `link && del` yet del also deletes the doc text**/
             .then(d => Promise.resolve()
                 .then(() => this.unlinkChild(d.oldDoc, oldParent))
                 .then(() => this.linkChild(d.newDoc, newParent))
+                .then(() => this.deleteDocs(docs))
+                .then(() => d.newDoc)
             );
     }
     
@@ -195,6 +241,7 @@ class Nav {
     }
         
 }
+
 var doc = new Doc();
 exports.nav = new Nav(doc);
 exports.doc = new Doc();
