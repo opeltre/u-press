@@ -22,6 +22,8 @@ function logthen (x) {
 }
 
 class Doc {
+    
+    // better be indexed by an immutable hash: mv!!
 
     constructor () {
         this.cxn = null;
@@ -56,6 +58,20 @@ class Doc {
         return this.db.getAll(...urls).delete()
             .run(this.cxn);
     }
+
+    mv (oldUrls, newUrls) {
+        //DIIIRTY 
+        return this.db.getAll(...oldUrls).run(this.cxn)
+            .then(docs => docs.toArray())
+            .then(docs => docs.map((doc,i) => {
+                var d = Object.assign({}, doc);
+                d.url = newUrls[i];
+                return d;
+            }))
+            .then(newDocs => this.db.insert(newDocs).run(this.cxn))
+            .then(() => this.db.getAll(...oldUrls).delete().run(this.cxn))
+            .then(logthen);
+    }           
 }
 
 class Nav { 
@@ -161,12 +177,15 @@ class Nav {
         if (oldParent == newParent) return docs[0];
         return Promise.resolve(docs)
             .then(docs => this.movedDocs(docs, oldParent, newParent)) 
-            .then(newDocs => {console.log(newDocs); return newDocs})
             .then(newDocs => this.runCheck(
                 this.db.insert(newDocs).run(this.cxn),
-                {oldDoc: docs[0], newDoc: newDocs[0]}
+                newDocs
             ))
-        /** could just be  `link && del` yet del also deletes the doc text**/
+            .then(newDocs => this.doc // diiirty class Doc
+                .mv(docs.map(d => d.url), newDocs.map(d => d.url))
+                .then(() => ({oldDoc: docs[0], newDoc: newDocs[0]}))
+            )
+            //could just be like `link && del`
             .then(d => Promise.resolve()
                 .then(() => this.unlinkChild(d.oldDoc, oldParent))
                 .then(() => this.linkChild(d.newDoc, newParent))
