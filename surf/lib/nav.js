@@ -35,8 +35,13 @@ function Nav () {
                 .call(my.item(self.lvl));
         // ctl: put del mv
         my.selection
+            .append('div').property('id', 'nav-input');
+        my.selection
             .append('div').property('id', 'nav-ctl')
             .call(my.ctl);
+        if (self.moving) 
+            my.selection.select('#nav-input')
+                .call(my.input());
         return my;
     };
     
@@ -82,6 +87,12 @@ function Nav () {
     my.slot = () => {
         return NavSlot()
             .bind((d,i) => my.mv(d.url, d.i));
+    }
+
+    my.input = () => {
+        return Input()
+            .btn('name')
+            .submit(val => alert(self.moving.replace(/[^\/]*\/$/,val)));
     }
 
     my.ctl = Ctl()

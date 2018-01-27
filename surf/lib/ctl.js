@@ -20,3 +20,38 @@ function Ctl () {
     return getset(my, self);
 
 }
+
+function Input() {
+
+    var self = {
+        submit: val => alert(val),
+        tmp: true,
+        val: '',
+        btn: 'submit'
+    };
+
+    function my (selection) {
+        console.log('input');
+        my.selection = selection.append('span');
+        my.selection.append('input')
+        my.selection.append('button')
+            .html(self.btn)
+            .on('click', my.onclick);
+    }
+
+    my.onclick = () => {
+        my.submit()(my.read());
+        if (self.tmp)
+            my.selection.remove();
+    }
+
+    my.read = () => {
+        return my.selection.select('input')
+            .property('value');
+    }
+
+    return getset(my, self);
+}
+
+            
+

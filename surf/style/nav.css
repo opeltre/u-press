@@ -1,22 +1,3 @@
-#nav span {
-    cursor: zoom-in;
-}
-
-#nav button {
-    font-family: nouveau_ibm;
-    color: #684b27;
-    background-color: #eee7df;
-    padding-left: 10px;
-    padding-right: 10px;
-    border: none;
-}
-
-#nav-ctl {
-    display: flex;
-    flex-flow: row;
-    justify-content: space-around;
-}
-
 .nav-item {
     padding: 3px;
     border: 1px solid #eee7d6;
@@ -46,6 +27,31 @@
     cursor: crosshair;
 }
 
+#nav span {
+    cursor: zoom-in;
+}
+
+#nav-ctl {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-around;
+}
+
+#nav button {
+    font-family: nouveau_ibm;
+    color: #684b27;
+    background-color: #eee7df;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: none;
+}
+
+#nav input {
+    border: 1px solid #eee7df;
+    max-width: 80%;
+    font-family: bowman;
+    text-align: right;
+}
 .doc a {
     color: #774545;
 }
