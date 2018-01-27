@@ -32,18 +32,6 @@ class Doc {
             .then(c => this.cxn = c);
     }    
 
-    get (url) {
-        return this.db.get(url)
-            .run(this.cxn)
-            .then(doc => doc.text);
-    }
-
-    post (url, text) {
-        return this.db.get(url)
-            .update({text:text})
-            .run(this.cxn)
-    }
-
     put (url) {
         return this.db
             .insert({
@@ -72,7 +60,21 @@ class Doc {
             .then(() => this.db.getAll(...oldUrls).delete().run(this.cxn))
             .then(logthen);
     }           
+
+    get (url) {
+        return this.db.get(url)
+            .run(this.cxn)
+            .then(doc => doc.text);
+    }
+
+    post (url, text) {
+        return this.db.get(url)
+            .update({text:text})
+            .run(this.cxn)
+    }
 }
+
+
 
 class Nav { 
 

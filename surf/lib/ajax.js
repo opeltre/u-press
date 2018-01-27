@@ -2,10 +2,7 @@
 //      : ajax().get(url).then((res) => ... )
 //      : ajax().post(url,data).then((res) => ... );
 
-function ajax () {
-    return new Ajax();
-}
-module.exports = ajax;
+const ajax = () => new Ajax();
 
 class Ajax {
     
@@ -30,6 +27,11 @@ class Ajax {
 
     put (url, data) {
         this.xhr.open('PUT', url);
+        return this.fill(data).promise();
+    }
+
+    move (url, data) {
+        this.xhr.open('MOVE', url);
         return this.fill(data).promise();
     }
 

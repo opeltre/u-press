@@ -15,8 +15,8 @@
     },
     
     {
-        "name": "surf",
-        "src": "dist/bundle.js"
+        "name": "ajax",
+        "src": "lib/ajax.js"
     }
 
 ]

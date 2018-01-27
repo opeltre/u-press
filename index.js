@@ -22,7 +22,12 @@ const onErr = (res) => (err) => {
     console.log(err);
     res.setHeader('Content-Type','application/json')
     res.end(JSON.stringify({error: `${err}`}));
-}
+};
+
+const sms = (res) => (text) => {
+    res.setHeader('Content-Type','text/plain')
+    res.end(text)
+};
 
 ////////////// @ root
 
@@ -80,7 +85,14 @@ app.delete('/route*', (req,res) => {
             res.end(JSON.stringify(children, null,2));
         })
         .catch(onErr(res));
-})
+});
+
+app.move('/route*', (req,res) => {
+    db.nav
+        .mv(req.params[0], req.body.to, req.body.n)
+        .then(() => sms(res)('mv'))
+        .catch(onErr(res));
+});
 
 ////////////// @ login
 

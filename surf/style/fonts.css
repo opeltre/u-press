@@ -34,3 +34,7 @@
     font-family:"anonymous-pro";
     src: url('/surf/media/fonts/anonymous-pro/Anonymous_Pro.ttf');
 }
+@font-face {
+    font-family:"iosevka";
+    src: url('/surf/media/fonts/iosevka/iosevka-regular.ttf');
+}
