@@ -1,69 +1,51 @@
-<head>
-    <meta charset="utf-8"/>
-    <title> u-press.it </title>
-</head>
+<html class="fullH">
+    <head>
+        <meta charset="utf-8"/>
+        <title> u-press.it </title>
+    </head>
 
-<body>
-    <div id="body-ctr" class="flex-ctr-h">       
-        <!-- La barre de nav -->
-        <nav class="flex-ctr-v">
-            <img 
-            id="home"
-            src="/surf/media/images/Vinci_dodecahedron.png"
-            alt="dodecahedron"
-            onclick="u.switch()"
-            />
-        </nav>
-
-
-        <div id="middle-ctr" class="flex-ctr-v">
-
-            <!-- Des boutons -->
+    <body class="fullH">
+        <div id="body-ctr" class="flex-ctr-v fullH">
+            <!--Home-->
             <header class="flex-ctr-h">
+                
+                <span> <!--Keep me for mobile ratio! -->
+                    <img 
+                    id="home"
+                    src="/surf/media/images/Vinci_dodecahedron.png"
+                    alt="dodecahedron"
+                    onclick="u.switch()"
+                    />
+                </span>
                 <h1>u-press.it</h1>
                 <span style="flex-grow:1"></span>
-                <!--
-                <a href="http://geogoo.net">Accueil</a>
-                <a href="http://you-talking-to-me.com">Aide</a>
-                <a href="http://ctrlaltdel.org">Couloir</a>
-                <a href="https://apod.nasa.gov/apod/random_apod.html">Sortie</a>
-                -->
+                
             </header>
-        
+
             <!-- Le livre ouvert -->
             <div id ="page-ctr" class="flex-ctr-h grow">
-                <div id="nav" style="display:none;width:200px;"></div>
-                <div id="page" class="page"></div>
-                <div id="view" class="page" style="display:none;" ></div>
+                
+                <div id="nav" class="grow" style="display:none;"></div>
+
+                <div class="margin grow shrink"></div>
+
+                <div id="page" class="page grow"></div>
+                <div id="view" class="page grow" style="display:none;" ></div>
+
+                <div class="margin grow shrink"></div>
+
             </div>
 
             <!-- D'autres boutons -->
             <footer class="flex-ctr-h">
+
                 <span id="page-ctl"></span>
                 <span class="grow"></span>
                 <span id="search">
-                    <input> O-  
+                    <input> O-   
                 </span>
-                
-                <!--
-                <span id="desk" class="read">
-                    <button id="mode-btn" onclick="page.modeSwitch()">edit</button>
-                    <button id="post-btn" onclick="page.post()">post</button>
-                </span>
-                <span id="surfing" class="browse">
-                    <button onclick="nav.rise()"> < </button>
-                    <button onclick="nav.read()"> /0-0\ </button>
-                    <button onclick="nav.del()"> - </button>
-                    <button onclick="nav.add()"> + </button>
-                </span>
-                <span style="flex-grow:1"></span>
-                -->
+
             </footer>
         </div>
-
-        <!-- Marge à droite -->
-        <div id="r-margin">
-        </div>
-    
-    </div>
-</body>
+    </body>
+</html>

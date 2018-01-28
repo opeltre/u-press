@@ -1,15 +1,38 @@
-html,body {
-    width: 100%;
-    height: 100%;
+html, body {
+    height: 100% !important;
+    max-width: 100%;
     background-color:white;
     margin: 0px;
-    overflow: hidden;
 }
-#body-ctr {
-    height: 100%;
-    width:100%;
-    max-height: 100%;
+
+.fullH {
+    min-height: 100% ;
 }
+
+header {
+    position: sticky;
+    top: 0;
+    flex-grow: 0;
+    justify-content: flex-end;
+}
+footer {
+    position: sticky;
+    bottom: 0;
+    padding: 5px;
+    justify-content: space-between;
+}
+header, footer {
+    z-index: 1;
+    width: 100%;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+.page {
+    padding: 10px;
+    max-width: 700px;
+}
+
 .flex-ctr-v {
     display: flex;
     flex-flow: column;
@@ -20,49 +43,16 @@ html,body {
 }
 .grow {
     flex-grow: 1;
-    max-height: 100%;
 }
-#middle-ctr {
-    flex-grow: 1;
-    max-height: 100%;
+.shrink {
+    flex-shrink: 1;
 }
 
-#page-ctr {
-    flex-grow: 1;
-    overflow: hidden;
-    max-height: 100%;
-}
-
-header {
-    flex-grow: 0;
-    padding-left: 0px;
-    margin-left: 0px;
-    margin-top:10px;
-    margin-bottom: 10px;
-    justify-content: flex-end;
-}
-.page {
-    flex-grow: 1;
-    padding: 10px;
-    overflow: auto;
-}
-
-footer {
-    padding: 5px;
-    justify-content: space-between;
-    height: 25px;
-}
-
-nav #home {
-    display: inline;
-    width:60px;
-    padding-top: 30px;
-    padding-right: 30px;
-    padding-left:30px;
+#home {
+    display: block;
+    max-width:40px;
+    max-height: 40px;
+    width:auto;
+    padding:10px;
     cursor: zoom-in;
 }
-
-#r-margin {
-    width: 120px;
-}
-

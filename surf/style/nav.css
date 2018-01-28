@@ -1,6 +1,16 @@
+#nav {
+    position: sticky;
+    top: 0;
+    min-width: 200px;
+    max-width: 40%;
+}
+
 .nav-item {
     padding: 3px;
     border: 1px solid #eee7d6;
+}
+.nav-item:nth-child(1) {
+    margin-left: 10px !important;
 }
 
 .nav-focus {
@@ -14,7 +24,6 @@
 .nav-item:hover > .nav-slot {
     display: block;
 }
-
 .nav-slot {
     display: none;
     margin-left: 5px;
@@ -51,20 +60,4 @@
     max-width: 80%;
     font-family: bowman;
     text-align: right;
-}
-.doc a {
-    color: #774545;
-}
-
-.child a {
-    color: #6b5a53;
-}
-
-#askName {
-    padding-left: 5px;
-}
-
-#askName input {
-    text-align: right;
-    width: 120px;
 }
