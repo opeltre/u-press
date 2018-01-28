@@ -21,6 +21,14 @@ function logthen (x) {
     return x;
 }
 
+parentUrl = url => url.replace(/[^\/]*\/?$/,'');
+url2name = url => url.replace(/.*\/([^\/]+)\/?$/, '$1');
+name2url = n => n.replace(/[^\w\s]/g, '').replace(/\s/g,'-') + '/';
+url2url = url => parentUrl(url) + name2url(url2name(url));
+
+console.log(url2name('/test/A/abc/'))
+console.log(name2url('ab cd e'))
+
 class Doc {
     
     // better be indexed by an immutable hash: mv!!
@@ -90,7 +98,7 @@ class Nav {
     
     init (url, name) { // data format
         return {
-            url: url + name.replace(/[^\w\s]/g,'').replace(/\s/g,'-') + '/',
+            url: url + name2url(name),
             name: name,
             parent: url,
             children: []
@@ -121,12 +129,13 @@ class Nav {
             ]));
     }
     
-    mv (url, newParent, n) {
-        return this.db.get(url).run(this.cxn)
+    mv (oldUrl, newUrl, n) {
+        newUrl = url2url(newUrl);
+        return this.db.get(oldUrl).run(this.cxn)
             .then(doc => this.dive([doc]))
-            .then(docs => this.move(docs, newParent))
+            .then(docs => this.move(docs, newUrl))
             .then(newDoc => this.indexOf(newDoc))
-            .then(k => this.order(newParent, k, n)); 
+            .then(k => this.order(parentUrl(newUrl), k, n)); 
     }
 
     // ---> User
@@ -154,12 +163,10 @@ class Nav {
         console.log('hey')
         return this.db.get(url).run(this.cxn)
             .then(p => this.reordered(p.children, k, n))
-            .then(logthen)
             .then(reordered => this.db.get(url)
                 .update({children: reordered})
                 .run(this.cxn)
-            )
-            .then(res => console.log(res));
+            );
     }
 
     reordered (a, k, n) {
@@ -174,11 +181,13 @@ class Nav {
             .concat(a.slice(M+1,));
     }
 
-    move (docs, newParent) {
-        var oldParent = docs[0].parent;
-        if (oldParent == newParent) return docs[0];
+    move (docs, newUrl) {
+        var oldParent = docs[0].parent,
+            newParent = parentUrl(newUrl);
+        if (docs[0].url == newUrl) return docs[0];
         return Promise.resolve(docs)
-            .then(docs => this.movedDocs(docs, oldParent, newParent)) 
+            .then(docs => this.movedDocs(docs, newUrl))
+            .then(logthen)
             .then(newDocs => this.runCheck(
                 this.db.insert(newDocs).run(this.cxn),
                 newDocs
@@ -196,13 +205,19 @@ class Nav {
             );
     }
     
-    movedDocs (docs, oldParent, newParent) {
-        return docs.map(doc => {
+    movedDocs (docs, newUrl) {
+        var oldUrl = docs[0].url;
+        return docs.map((doc,i) => {
             var d = Object.assign({}, doc);
-            d.url = d.url.replace(oldParent, newParent);
-            d.parent = d.parent.replace(oldParent, newParent);
+            d.url = d.url.replace(oldUrl, newUrl);
             d.children = d.children
-                .map(url => url.replace(oldParent, newParent));
+                .map(url => url.replace(oldUrl, newUrl));
+            d.parent = d.parent.replace(...i == 0
+                ? [parentUrl(oldUrl), parentUrl(newUrl)]
+                : [oldUrl, newUrl]
+            );
+            if (i == 0)
+                d.name = newUrl.replace(/.*\/([^\/]*)\/$/, "$1");
             return d;
         });
     }

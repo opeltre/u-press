@@ -1,4 +1,5 @@
 // ./surf/lib/nav.js
+
 function Nav () {
 
 /* nav panel:
@@ -41,7 +42,7 @@ function Nav () {
             .call(my.ctl);
         if (self.moving) 
             my.selection.select('#nav-input')
-                .call(my.input());
+                .call(my.input);
         return my;
     };
     
@@ -62,10 +63,11 @@ function Nav () {
     };
 
     my.mv = (to, n) => {
-        if (to.startsWith(self.moving))return alert("don't move it!"); 
+        if (to.startsWith(self.moving)) return alert("don't do it!"); 
+        console.log(self.moving, to, n);
         return ajax()
             .move('/route'+self.moving, JSON.stringify({to:to, n:n}))
-            .then(() => my.moving(null).route(to)());
+            .then(() => my.moving(null).route(my.parentUrl(to))());
     }
 
     my.move = () => {
@@ -86,14 +88,15 @@ function Nav () {
 
     my.slot = () => {
         return NavSlot()
-            .bind((d,i) => my.mv(d.url, d.i));
+            .bind((d,i) => my.mv(d.url + my.input.read(), d.i));
     }
 
-    my.input = () => {
-        return Input()
-            .btn('name')
-            .submit(val => alert(self.moving.replace(/[^\/]*\/$/,val)));
-    }
+    my.input = Input()
+        .btn('mv')
+        .init(i => i
+            .val(my.nameUrl(self.moving))
+            .submit(val => my.mv(my.parentUrl(self.moving)+ val + '/'))
+        );
 
     my.ctl = Ctl()
         .buttons([
@@ -102,7 +105,12 @@ function Nav () {
             [' &gt; ', my.move]
         ]);
     
+    // url helpers: flatten tree & make them dispensable
+    my.nameUrl = url => url.replace(/.*\/([^\/]+)\/?$/, '$1');
+    my.parentUrl = url => url.replace(/[^\/]*\/?$/, '');
+    
     return getset(my, self);
+
 }
 
 

@@ -27,13 +27,16 @@ function Input() {
         submit: val => alert(val),
         tmp: true,
         val: '',
-        btn: 'submit'
+        btn: 'submit',
+        init: () => {} 
     };
 
     function my (selection) {
         console.log('input');
+        my.init()(my);
         my.selection = selection.append('span');
         my.selection.append('input')
+            .property('value',self.val)
         my.selection.append('button')
             .html(self.btn)
             .on('click', my.onclick);
