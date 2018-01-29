@@ -32,9 +32,8 @@ function Input() {
     };
 
     function my (selection) {
-        console.log('input');
         my.init()(my);
-        my.selection = selection.append('span');
+        my.selection = selection
         my.selection.append('input')
             .property('value',self.val)
         my.selection.append('button')
@@ -45,7 +44,7 @@ function Input() {
     my.onclick = () => {
         my.submit()(my.read());
         if (self.tmp)
-            my.selection.remove();
+            my.selection.call(flush);
     }
 
     my.read = () => {

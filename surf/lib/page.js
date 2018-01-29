@@ -53,7 +53,6 @@ function Page () {
     }
 
     my.scroll = () => {
-        console.log(my.scrollY());
         window.scrollTo(0,my.scrollY());
         return my;
     }

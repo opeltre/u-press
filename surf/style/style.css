@@ -7,16 +7,22 @@ header h1 {
     font-size: 22px;
     margin: auto;
 }
-
+footer {
+    padding: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
 footer * {
     font-family: nouveau_ibm;
     color: #684b27;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 footer button {
     background-color: #eee7df;
     border: none;
-    padding: 5px;
+    padding: 3px;
 }
 
 footer input {

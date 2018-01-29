@@ -32,7 +32,7 @@
     background-color: #eee7d6;
 }
 .nav-slot:hover {
-    background-color: #ddd6e5 !important;
+    background-color: #ccc5b4 !important;
     cursor: crosshair;
 }
 
@@ -40,11 +40,17 @@
     cursor: zoom-in;
 }
 
-#nav-ctl {
+#nav-ctl, #nav-input {
     display: flex;
     flex-flow: row;
     justify-content: space-around;
 }
+#nav-input {
+    margin-right: 5px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+} 
 
 #nav button {
     font-family: nouveau_ibm;
@@ -52,12 +58,14 @@
     background-color: #eee7df;
     padding-left: 10px;
     padding-right: 10px;
+    margin:1px;
     border: none;
 }
 
-#nav input {
+#nav-input input {
+    flex-grow: 1;
     border: 1px solid #eee7df;
-    max-width: 80%;
+    color: #684b27;
     font-family: bowman;
     text-align: right;
 }
