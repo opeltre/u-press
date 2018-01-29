@@ -25,7 +25,6 @@ function hideNseek (displays) {
                         'display',
                         s.style('display') == 'none' ? k : 'none'
                     );
-                    console.log(s.node());
                 });
             });
     }

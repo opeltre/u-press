@@ -14,6 +14,7 @@ function Page () {
         mode: 'r',
         text: 'yoooo',
         posted: true,
+        scrollY: 0,
         parser: jam.parse
     }
 
@@ -21,6 +22,7 @@ function Page () {
         my.selection = (selection || my.selection);
         return my.get()
             .then(my.view)
+            .then(my.scroll);
     }
 
     my.switch = () => {
@@ -48,6 +50,12 @@ function Page () {
                 my.parser()(my.read().text())
             );
         return my.mathjax();
+    }
+
+    my.scroll = () => {
+        console.log(my.scrollY());
+        window.scrollTo(0,my.scrollY());
+        return my;
     }
 
     my.mathjax = () => {
