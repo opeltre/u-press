@@ -48,7 +48,11 @@ function Page () {
         my.selection
             .html(
                 my.parser()(my.read().text())
-            );
+            )
+            .selectAll('.jam-hide')
+            .each(function () {
+                d3.select(this).call(my.jamHide);
+            });
         return my.mathjax();
     }
 
@@ -59,6 +63,19 @@ function Page () {
 
     my.mathjax = () => {
         MathJax.Hub.Queue(["Typeset",MathJax.Hub, my.selection.property('id')]);
+        return my;
+    }
+
+    my.jamHide = (div) => {
+        div.select('.jam-hide-body')
+            .style('display','none');
+        div.select('.jam-hide-title')
+            .append('span')
+            .html(' &#8645; ')
+            .on(
+                'click',
+                () => hideNseek({'block': ['.jam-hide-body']}, div)()
+            );
         return my;
     }
 
@@ -81,4 +98,3 @@ function Page () {
     
     return getset(my,self);
 }
-                

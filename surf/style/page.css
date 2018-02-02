@@ -1,13 +1,20 @@
 .page {
     border: 2px solid #fff8e7;
+    padding: 20px;
 }
 
 .page * {
-    font-family: libertine;
+    font-family: liberation-serif;
+}
+
+.page p {
+    text-align: justify;
 }
 
 .page h1, .page h2, .page h3 {
-    font-family: bowman; 
+    margin-top: 40px;
+    font-family: bowman;
+    font-weight: normal;
 }
 
 #page textarea {
@@ -28,6 +35,9 @@
 .page pre {
     background-color: #faf8f5;
 }
+.page a {
+    color: #5f5f52;
+}
 #view {
     opacity: 0.9;
     background-color: #faf8f5;
@@ -36,17 +46,15 @@
     margin-left: 2px;
 }
 
-.page .def {
-    padding: 10px;
-    border: 2px solid #fff8e7;
+.jam-hide-title {
+    font-style: bold;
+    color: #5f5f52;
 }
 
-.page .prop {
-    padding: 10px;
-    border: 2px solid #eee7d6;
-}
-
-.page .thm {
-    padding: 10px;
-    border: 2px solid #ddd6c5;
+.jam-hide-body {
+    margin-left: 30px;
+    margin-bottom: 5px;
+    padding-left: 10px;
+    border-left: 1px solid #eee7d6;
+    color: #5f5f52;
 }

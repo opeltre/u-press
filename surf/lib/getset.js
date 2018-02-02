@@ -14,13 +14,21 @@ function getset (obj, attrs) {
     return obj;
 }
 
-function hideNseek (displays) {
+function hideNseek (displays, selection) {
+    /* the function that hides and shows
+     *
+     *  :   hideNseek(
+     *  :       {'inline': '.class', 'block': '#id'},
+     *  :       selection || document
+     *  :   )
+     */
 
     return () => {
+        var S = selection || d3.select(document);
         Object.keys(displays)
             .forEach( k => {
                 displays[k].forEach(q => {
-                    s = d3.select(q);
+                    s = S.select(q);
                     s.style(
                         'display',
                         s.style('display') == 'none' ? k : 'none'

@@ -38,3 +38,15 @@
     font-family:"iosevka";
     src: url('/surf/media/fonts/iosevka/iosevka-regular.ttf');
 }
+@font-face {
+    font-family: "nord-sud";
+    src: url('/surf/media/fonts/nord-sud/ttf/NordSudA.ttf');
+}
+@font-face {
+    font-family: "judson";
+    src: url('/surf/media/fonts/judson/Judson.ttf');
+}
+@font-face {
+    font-family: "liberation-serif";
+    src: url('/surf/media/fonts/liberationSerif/LiberationSerif.ttf');
+}

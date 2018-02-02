@@ -368,6 +368,11 @@ const jam = require('./jam');
  * Even better, markdown, tex, and custom functionality
  * should be made as independent as possible,
  * so as to provide a bare markdown parser to tweak at will.
+ *
+ * In particular, separate markdown blocks from custom ones,
+ * like def, prop, thm, etc. That will make them more easily
+ * configurable.
+ *
  */
 
 function lexBlock (lang) {
@@ -424,32 +429,31 @@ function lexBlock (lang) {
         .render('close', () => ['</script>','']);
 
     const idfy = c => c
-        .replace(/\s$/,'')
+        .replace(/\s*$/,'')
         .replace(/\s/,'-')
+        .replace(/[éè]/,'e')
+        .replace(/\W/,'')
         .toLowerCase();
 
-    var def = jam.tok('def', /^,{3,}(\w*)\s*$/, /^,{3,}\s*/, "stop b")
-        .render('open',(a,b,c) => [
-            `<div class="def" id="def-${idfy(c)}">`, 
-            "**Definition:**" + b
+    var div = jam.tok('ex', /^~{3,}([éè\w\s\.:]+)\s*$/, /^~{3,}\s*/, "stop b")
+        .render('open', (a,b,c) => [
+            `<div class="jam-div ${idfy(c)}">
+            <div class="jam-div-title">${c}</div>
+            <div class="jam-div-body">`,
+            ''
         ])
-        .render('close', () => ["</div>",""]);
+        .render('close', () => ["</div></div>",""]);
 
-    var prop = jam.tok('prop', /^;{3,}(\w*)\s*$/, /^;{3,}\s*/, "stop b")
-        .render('open',(a,b,c) => [
-            `<div class="prop" id="prop-${idfy(c)}">`, 
-            "**Proposition:**" + b
+    var div_hide = jam.tok('ex', /^\/{3,}([éè\w\s\.:]+)\s*$/, /^\/{3,}\s*/, "stop b")
+        .render('open', (a,b,c) => [
+            `<div class="jam-hide ${idfy(c)}">
+            <div class="jam-hide-title">${c}</div>
+            <div class="jam-hide-body">`,
+            ''
         ])
-        .render('close', () => ["</div>",""]);
+        .render('close', () => ["</div></div>",""]);
 
-    var thm = jam.tok('thm', /^:{3,}(\w*)\s*$/, /^:{3,}\s*/, "stop b")
-        .render('open',(a,b,c) => [
-            `<div class="thm" id="thm-${idfy(c)}">`, 
-            "**Theorem:** " + b
-        ])
-        .render('close', () => ["</div>",""]);
-
-    return jam.lex([q, h, c, b, eq, ul, li, def, prop, thm]);
+    return jam.lex([q, h, c, b, eq, ul, li, div, div_hide]);
 }
 
 /* * * * * * * * * * * * *
