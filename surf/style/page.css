@@ -47,14 +47,18 @@
 }
 
 .jam-hide-title {
-    font-style: bold;
-    color: #5f5f52;
+    font-weight: bold;
+    color: #7a7a7a;
 }
-
-.jam-hide-body {
+.jam-div-title {
+    font-weight: bold;
+}
+.jam-hide-body, .jam-div-body {
     margin-left: 30px;
     margin-bottom: 5px;
     padding-left: 10px;
     border-left: 1px solid #eee7d6;
-    color: #5f5f52;
+}
+.jam-hide-body {
+    color: #606060;
 }

@@ -503,18 +503,21 @@ function lexInline () {
 
     var em = jam.tok('em', /^\*(?!\*)/, endP(/\*(?!\*)$/), 'o_c' );
     var strong = jam.tok('strong', /^\*\*(?!\*)/, endP(/\*\*(?!\*)$/), 'o_c');
-    var code = jam.tok('code', /^`/, endP(/`$/), 'o_c');
+    var code = jam.tok('code', /^`/, endP(/`$/), 'o_c esc');
 
     var ieq = jam.tok('ieq', /^''/, endP(/''$/), 'o_c esc')
         .render('open', (a, b) => ['<script type="math/tex">', b])
         .render('close', (a, b, c) => ['</script>' + c, b])
 
+    var deq = jam.tok('ieq', /^'''/, endP(/'''$/), 'o_c esc')
+        .render('open', (a, b) => ['<script type="math/tex; mode=display">', b])
+        .render('close', (a, b, c) => ['</script>' + c, b])
 
     var inlines = [em, strong, code]
         .map( lexeme => lexeme
             .render('close', (a, b, c) => [`</${lexeme.name}>${c}`, b])
         )
-        .concat([ieq])
+        .concat([ieq, deq])
 
     return jam.lex(inlines, "o_c");
 }
